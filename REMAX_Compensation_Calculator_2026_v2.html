@@ -1,0 +1,1769 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#003366">
+    <title>RE/MAX Delta Ktima | Compensation Calculator 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #003366;
+            --primary-dark: #002244;
+            --secondary: #DC143C;
+            --secondary-light: #ff1a4d;
+            --success: #28a745;
+            --warning: #ffc107;
+            --light: #f8f9fa;
+            --dark: #1a1a2e;
+            --gold: #c9a227;
+            --gradient: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            --shadow: 0 10px 40px rgba(0,51,102,0.15);
+            --shadow-hover: 0 20px 60px rgba(0,51,102,0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: linear-gradient(180deg, #f0f4f8 0%, #e8eef5 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            -webkit-tap-highlight-color: transparent;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 3px solid var(--secondary);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            height: 50px;
+        }
+
+        .logo-img {
+            height: 40px;
+            width: auto;
+        }
+
+        @media (max-width: 768px) {
+            .logo-img {
+                height: 32px;
+            }
+        }
+
+        .header-title {
+            color: var(--primary);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--primary);
+        }
+
+        .header-title span {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: 400;
+        }
+
+        .header-badge {
+            background: var(--secondary);
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Navigation Tabs */
+        .nav-container {
+            background: white;
+            padding: 0 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 78px;
+            z-index: 99;
+        }
+
+        @media (max-width: 768px) {
+            .nav-container {
+                padding: 0;
+                position: relative;
+                top: 0;
+            }
+
+            .nav-container::after {
+                content: '';
+                position: absolute;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                width: 30px;
+                background: linear-gradient(to right, transparent, white);
+                pointer-events: none;
+            }
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0;
+            max-width: 1400px;
+            margin: 0 auto;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-tab {
+            padding: 1rem 1.5rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--primary);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            background: var(--light);
+            color: var(--secondary);
+        }
+
+        .nav-tab:active {
+            transform: scale(0.98);
+        }
+
+        .nav-tab.active {
+            border-bottom-color: var(--secondary);
+            color: var(--secondary);
+            background: linear-gradient(180deg, transparent 0%, rgba(220,20,60,0.05) 100%);
+        }
+
+        /* Main Content */
+        .main {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .card-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .card-subtitle {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        /* Input Groups */
+        .input-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .input-label {
+            display: block;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e0e6ed;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            color: var(--primary);
+            background: #fafbfc;
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--secondary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(220,20,60,0.1);
+        }
+
+        .input-hint {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 0.25rem;
+        }
+
+        /* Checkbox styling */
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            padding: 0.5rem 0;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--secondary);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 160px;
+        }
+
+        @media (max-width: 768px) {
+            html {
+                scroll-padding-top: 140px;
+            }
+        }
+
+        /* Results */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .result-box {
+            background: var(--light);
+            border-radius: 12px;
+            padding: 1.25rem;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .result-box:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .result-box.highlight {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .result-box.success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .result-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-value {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+
+        .result-sub {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 0.25rem;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background: var(--gradient);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        th:first-child { border-radius: 10px 0 0 0; }
+        th:last-child { border-radius: 0 10px 0 0; }
+
+        td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover td {
+            background: var(--light);
+        }
+
+        tr:last-child td:first-child { border-radius: 0 0 0 10px; }
+        tr:last-child td:last-child { border-radius: 0 0 10px 0; }
+
+        .highlight-row td {
+            background: #e8f5e9 !important;
+            font-weight: 600;
+        }
+
+        .bonus-badge {
+            background: var(--success);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Grid Layout */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Parameters Section */
+        .param-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .param-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--light);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .param-name {
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .param-value {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            color: var(--primary);
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .footer strong {
+            color: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 0.75rem;
+                text-align: center;
+                padding: 1rem;
+            }
+
+            .header-title h1 {
+                font-size: 1.2rem;
+            }
+
+            .header-title span {
+                font-size: 0.75rem;
+            }
+
+            .logo {
+                height: 40px;
+            }
+
+            .header-badge {
+                padding: 0.4rem 1rem;
+                font-size: 0.75rem;
+            }
+
+            .nav-container {
+                position: relative;
+                top: 0;
+            }
+
+            .nav-tabs {
+                gap: 0;
+                padding-bottom: 0.25rem;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .nav-tab {
+                padding: 0.75rem 0.6rem;
+                font-size: 0.7rem;
+                flex-shrink: 0;
+            }
+
+            .main {
+                padding: 0 0.75rem;
+                margin-top: 1rem;
+            }
+
+            .card {
+                padding: 1.25rem;
+                border-radius: 12px;
+                margin-bottom: 1rem;
+            }
+
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            .card-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            .card-title {
+                font-size: 1.1rem;
+            }
+
+            .card-subtitle {
+                font-size: 0.75rem;
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .results-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+
+            .result-box {
+                padding: 1rem 0.75rem;
+                border-radius: 10px;
+            }
+
+            .result-label {
+                font-size: 0.65rem;
+                line-height: 1.2;
+            }
+
+            .result-value {
+                font-size: 1.2rem;
+            }
+
+            .result-sub {
+                font-size: 0.65rem;
+            }
+
+            .input-group {
+                margin-bottom: 1rem;
+            }
+
+            .input-label {
+                font-size: 0.85rem;
+            }
+
+            .input-field {
+                padding: 0.75rem;
+                font-size: 16px; /* Prevents zoom on iOS */
+                border-radius: 8px;
+            }
+
+            .input-hint {
+                font-size: 0.7rem;
+            }
+
+            /* Tables on mobile */
+            .table-container {
+                margin: 0 -1.25rem;
+                padding: 0 0.5rem;
+            }
+
+            table {
+                font-size: 0.75rem;
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            th, td {
+                padding: 0.6rem 0.5rem;
+            }
+
+            th {
+                font-size: 0.7rem;
+            }
+
+            .bonus-badge {
+                font-size: 0.65rem;
+                padding: 0.2rem 0.5rem;
+            }
+
+            /* Parameters on mobile */
+            .param-grid {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .param-item {
+                padding: 0.75rem;
+                font-size: 0.85rem;
+            }
+
+            .param-value {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.85rem;
+            }
+
+            h3 {
+                font-size: 1rem !important;
+            }
+
+            .footer {
+                padding: 1.5rem 1rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Extra small screens (iPhone SE, etc.) */
+        @media (max-width: 375px) {
+            .header-title h1 {
+                font-size: 1rem;
+            }
+
+            .nav-tab {
+                padding: 0.6rem 0.5rem;
+                font-size: 0.65rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .card-title {
+                font-size: 1rem;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem;
+            }
+
+            .result-value {
+                font-size: 1.1rem;
+            }
+
+            .result-label {
+                font-size: 0.6rem;
+            }
+
+            table {
+                font-size: 0.7rem;
+            }
+
+            th, td {
+                padding: 0.5rem 0.4rem;
+            }
+        }
+
+        /* Touch improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .nav-tab {
+                min-height: 44px;
+            }
+
+            .input-field {
+                min-height: 44px;
+            }
+
+            .result-box {
+                min-height: 70px;
+            }
+
+            select.input-field {
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: right 12px center;
+                -webkit-appearance: none;
+                appearance: none;
+                padding-right: 36px;
+            }
+        }
+
+        /* Safe area for notched iPhones */
+        @supports (padding: max(0px)) {
+            .header {
+                padding-left: max(1rem, env(safe-area-inset-left));
+                padding-right: max(1rem, env(safe-area-inset-right));
+            }
+
+            .main {
+                padding-left: max(0.75rem, env(safe-area-inset-left));
+                padding-right: max(0.75rem, env(safe-area-inset-right));
+            }
+
+            .footer {
+                padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .slide-up {
+            animation: slideUp 0.6s ease forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Print Styles */
+        @media print {
+            .header, .nav-container { position: static; }
+            .section { display: block !important; page-break-inside: avoid; }
+            .card { box-shadow: none; border: 1px solid #ddd; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo-container">
+            <img src="data:image/png;base64,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" alt="RE/MAX Delta Ktima" class="logo-img">
+            <div class="header-title">
+                <h1>Compensation Calculator</h1>
+                <span>Νέο Σύστημα Αμοιβών 2026</span>
+            </div>
+        </div>
+        <div class="header-badge">Cap-Based System</div>
+    </header>
+
+    <nav class="nav-container">
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="individual">👤 Individual</button>
+            <button class="nav-tab" data-tab="team-leader">👥 Team Leader</button>
+            <button class="nav-tab" data-tab="team-member">🧑‍💼 Team Member</button>
+            <button class="nav-tab" data-tab="comparison">📊 Σύγκριση</button>
+            <button class="nav-tab" data-tab="scenarios">📋 Σενάρια 2026</button>
+            <button class="nav-tab" data-tab="parameters">⚙️ Παράμετροι</button>
+        </div>
+    </nav>
+
+    <main class="main">
+        <!-- INDIVIDUAL SECTION -->
+        <section id="individual" class="section active">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">👤</div>
+                        <div>
+                            <div class="card-title">Υπολογιστής Individual</div>
+                            <div class="card-subtitle">Cap €50.000 | Πριν: 50/50 | Μετά: 80/20</div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Ετήσιο GCI (€)</label>
+                        <input type="number" id="ind-gci" class="input-field" value="70000" min="0" step="1000">
+                        <div class="input-hint">Gross Commission Income - Ακαθάριστα Έσοδα Προμηθειών</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Τύπος Φορολογίας</label>
+                        <select id="ind-tax-type" class="input-field">
+                            <option value="atomiki">Ατομική Επιχείρηση (κλίμακα 9-44%)</option>
+                            <option value="ee">Ετερόρρυθμη Εταιρεία (22% flat)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group" id="ind-new-business-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="ind-new-business">
+                            <span>Νέος Επιτηδευματίας (πρώτα 3 έτη → 4,5% αντί 9%)</span>
+                        </label>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Προκαταβολή Φόρου</label>
+                        <select id="ind-prepayment" class="input-field">
+                            <option value="0.55">55% (κανονική)</option>
+                            <option value="0.50">50% (πρώτο έτος)</option>
+                            <option value="0">0% (χωρίς προκαταβολή)</option>
+                        </select>
+                    </div>
+
+                    <div class="results-grid">
+                        <div class="result-box">
+                            <div class="result-label">GCI πριν Cap</div>
+                            <div class="result-value" id="ind-gci-before">€60.000</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">GCI μετά Cap</div>
+                            <div class="result-value" id="ind-gci-after">€10.000</div>
+                        </div>
+                        <div class="result-box highlight">
+                            <div class="result-label">Agent Gross (ΝΕΟ)</div>
+                            <div class="result-value" id="ind-gross">€38.000</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">Agent Gross (ΠΑΛΙΟ)</div>
+                            <div class="result-value" id="ind-gross-old">€35.000</div>
+                            <div class="result-sub">50/50 flat</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">Office Gross</div>
+                            <div class="result-value" id="ind-office">€32.000</div>
+                        </div>
+                        <div class="result-box success">
+                            <div class="result-label">Διαφορά Gross</div>
+                            <div class="result-value" id="ind-gross-diff">+€3.000</div>
+                            <div class="result-sub">νέο vs παλιό</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">💰</div>
+                        <div>
+                            <div class="card-title">Καθαρές Αποδοχές</div>
+                            <div class="card-subtitle">Μετά από Desk Fee, ΕΦΚΑ, Φόρο</div>
+                        </div>
+                    </div>
+
+                    <div class="results-grid">
+                        <div class="result-box">
+                            <div class="result-label">Desk Fee (ετήσιο)</div>
+                            <div class="result-value">€1.200</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">ΕΦΚΑ (ετήσιο)</div>
+                            <div class="result-value">€2.640</div>
+                            <div class="result-sub">~€220/μήνα</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">Φόρος (βάση)</div>
+                            <div class="result-value" id="ind-tax-base">€8.348</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">Προκαταβολή Φόρου</div>
+                            <div class="result-value" id="ind-tax-prepay">€4.591</div>
+                            <div class="result-sub" id="ind-prepay-rate">55%</div>
+                        </div>
+                        <div class="result-box" style="background: #fff3e0;">
+                            <div class="result-label">Σύνολο Φόρου (1ο έτος)</div>
+                            <div class="result-value" id="ind-tax-total">€12.939</div>
+                            <div class="result-sub">βάση + προκαταβολή</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">Effective Split</div>
+                            <div class="result-value" id="ind-split">54,3%</div>
+                            <div class="result-sub">του GCI στον agent</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px dashed #e0e6ed;">
+                        <h4 style="color: var(--primary); margin-bottom: 1rem; font-family: 'Montserrat', sans-serif;">📊 Σύγκριση Συστημάτων</h4>
+                        <div class="results-grid">
+                            <div class="result-box highlight">
+                                <div class="result-label">Καθαρό (ΝΕΟ)</div>
+                                <div class="result-value" id="ind-net">€21.221</div>
+                                <div class="result-sub">με νέο σύστημα</div>
+                            </div>
+                            <div class="result-box">
+                                <div class="result-label">Καθαρό (ΠΑΛΙΟ)</div>
+                                <div class="result-value" id="ind-net-old">€19.301</div>
+                                <div class="result-sub">με 50/50 flat</div>
+                            </div>
+                            <div class="result-box success">
+                                <div class="result-label">ΔΙΑΦΟΡΑ</div>
+                                <div class="result-value" id="ind-net-diff">+€1.920</div>
+                                <div class="result-sub">ετήσιο όφελος</div>
+                            </div>
+                            <div class="result-box highlight">
+                                <div class="result-label">Μηνιαίο (ΝΕΟ)</div>
+                                <div class="result-value" id="ind-monthly12">€1.768</div>
+                                <div class="result-sub">/12 μήνες</div>
+                            </div>
+                            <div class="result-box">
+                                <div class="result-label">Μηνιαίο (ΠΑΛΙΟ)</div>
+                                <div class="result-value" id="ind-monthly12-old">€1.608</div>
+                                <div class="result-sub">/12 μήνες</div>
+                            </div>
+                            <div class="result-box success">
+                                <div class="result-label">ΔΙΑΦΟΡΑ /μήνα</div>
+                                <div class="result-value" id="ind-monthly-diff">+€160</div>
+                                <div class="result-sub">μηνιαίο όφελος</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TEAM LEADER SECTION -->
+        <section id="team-leader" class="section">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">👥</div>
+                        <div>
+                            <div class="card-title">Υπολογιστής Team Leader</div>
+                            <div class="card-subtitle">Cap €50k+n×€35k (min €75k) | TL: 70/30→90/10 | Override: 20%</div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">TL GCI (€)</label>
+                        <input type="number" id="tl-gci" class="input-field" value="80000" min="0" step="1000">
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Αριθμός Μελών</label>
+                        <input type="number" id="tl-members" class="input-field" value="3" min="1" max="10">
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">GCI Μέλους 1 (€)</label>
+                        <input type="number" id="tl-m1" class="input-field" value="40000" min="0" step="1000">
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">GCI Μέλους 2 (€)</label>
+                        <input type="number" id="tl-m2" class="input-field" value="35000" min="0" step="1000">
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">GCI Μέλους 3 (€)</label>
+                        <input type="number" id="tl-m3" class="input-field" value="30000" min="0" step="1000">
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">GCI Μέλους 4 (€)</label>
+                        <input type="number" id="tl-m4" class="input-field" value="0" min="0" step="1000">
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Τύπος Φορολογίας TL</label>
+                        <select id="tl-tax-type" class="input-field">
+                            <option value="atomiki">Ατομική Επιχείρηση (κλίμακα 9-44%)</option>
+                            <option value="ee">Ετερόρρυθμη Εταιρεία (22% flat)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Προκαταβολή Φόρου</label>
+                        <select id="tl-prepayment" class="input-field">
+                            <option value="0.55">55% (κανονική)</option>
+                            <option value="0.50">50% (πρώτο έτος)</option>
+                            <option value="0">0% (χωρίς προκαταβολή)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">📈</div>
+                        <div>
+                            <div class="card-title">Αποτελέσματα Team Leader</div>
+                            <div class="card-subtitle">Συνολικά έσοδα από ομάδα</div>
+                        </div>
+                    </div>
+
+                    <div class="results-grid">
+                        <div class="result-box">
+                            <div class="result-label">Headcount</div>
+                            <div class="result-value" id="tl-headcount">4</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">Team Cap</div>
+                            <div class="result-value" id="tl-cap">€200.000</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">Team Total GCI</div>
+                            <div class="result-value" id="tl-total">€185.000</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">Περνάει το Cap;</div>
+                            <div class="result-value" id="tl-pass">ΟΧΙ</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">Override Income</div>
+                            <div class="result-value" id="tl-override">€21.000</div>
+                            <div class="result-sub">20% από μέλη</div>
+                        </div>
+                        <div class="result-box highlight">
+                            <div class="result-label">TL Gross</div>
+                            <div class="result-value" id="tl-gross">€77.000</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">Φόρος (βάση)</div>
+                            <div class="result-value" id="tl-tax-base">€20.500</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">Προκαταβολή</div>
+                            <div class="result-value" id="tl-tax-prepay">€11.275</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">Σύνολο Φόρου</div>
+                            <div class="result-value" id="tl-tax-total">€31.775</div>
+                        </div>
+                        <div class="result-box success">
+                            <div class="result-label">TL Καθαρό (ΝΕΟ)</div>
+                            <div class="result-value" id="tl-net">€30.585</div>
+                        </div>
+                        <div class="result-box highlight">
+                            <div class="result-label">Μηνιαίο/12</div>
+                            <div class="result-value" id="tl-monthly">€2.549</div>
+                        </div>
+                    </div>
+
+                    <!-- Old vs New Comparison for TL -->
+                    <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 12px; padding: 1.25rem; margin-top: 1.25rem;">
+                        <div style="font-weight: 700; color: var(--primary); margin-bottom: 0.75rem; font-family: 'Montserrat', sans-serif;">📊 Σύγκριση με Παλιό (70/30 flat, χωρίς override)</div>
+                        <div class="results-grid" style="margin-top: 0;">
+                            <div class="result-box" style="background: white;">
+                                <div class="result-label">Gross (ΠΑΛΙΟ)</div>
+                                <div class="result-value" id="tl-old-gross">€40.000</div>
+                            </div>
+                            <div class="result-box" style="background: white;">
+                                <div class="result-label">Net (ΠΑΛΙΟ)</div>
+                                <div class="result-value" id="tl-old-net">€22.000</div>
+                            </div>
+                            <div class="result-box success">
+                                <div class="result-label">Διαφορά Net</div>
+                                <div class="result-value" id="tl-net-diff">+€8.585</div>
+                                <div class="result-sub">ετήσιο όφελος</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TEAM MEMBER SECTION -->
+        <section id="team-member" class="section">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">🧑‍💼</div>
+                        <div>
+                            <div class="card-title">Υπολογιστής Team Member</div>
+                            <div class="card-subtitle">Approach B: 50/20/30 → 70/20/10 | Ατομική + 55% προκαταβολή</div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Member GCI (€)</label>
+                        <input type="number" id="mem-gci" class="input-field" value="40000" min="0" step="1000">
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Team Cap (€)</label>
+                        <input type="number" id="mem-cap" class="input-field" value="200000" min="0" step="10000">
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Team Total GCI (€)</label>
+                        <input type="number" id="mem-total" class="input-field" value="240000" min="0" step="10000">
+                        <div class="input-hint">Αν > Cap, ενεργοποιείται το premium split</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon">💵</div>
+                        <div>
+                            <div class="card-title">Αποτελέσματα Member</div>
+                            <div class="card-subtitle">Προσωπικό εισόδημα</div>
+                        </div>
+                    </div>
+
+                    <div class="results-grid">
+                        <div class="result-box">
+                            <div class="result-label">Περνάει η ομάδα το Cap;</div>
+                            <div class="result-value" id="mem-pass">ΝΑΙ ★</div>
+                        </div>
+                        <div class="result-box highlight">
+                            <div class="result-label">Member Gross</div>
+                            <div class="result-value" id="mem-gross">€21.333</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">Προς TL (20%)</div>
+                            <div class="result-value" id="mem-to-tl">€8.000</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">Προς Office</div>
+                            <div class="result-value" id="mem-to-office">€10.667</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">Φόρος</div>
+                            <div class="result-value" id="mem-tax">€3.137</div>
+                        </div>
+                        <div class="result-box success">
+                            <div class="result-label">Member Καθαρό (ΝΕΟ)</div>
+                            <div class="result-value" id="mem-net">€14.284</div>
+                        </div>
+                        <div class="result-box highlight">
+                            <div class="result-label">Μηνιαίο/12</div>
+                            <div class="result-value" id="mem-monthly">€1.190</div>
+                        </div>
+                        <div class="result-box">
+                            <div class="result-label">Effective Split</div>
+                            <div class="result-value" id="mem-split">53,3%</div>
+                        </div>
+                    </div>
+
+                    <!-- Old vs New Comparison for Member -->
+                    <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 12px; padding: 1.25rem; margin-top: 1.25rem;">
+                        <div style="font-weight: 700; color: var(--primary); margin-bottom: 0.75rem; font-family: 'Montserrat', sans-serif;">📊 Σύγκριση με Παλιό (50/50 flat, desk €100/μήνα)</div>
+                        <div class="results-grid" style="margin-top: 0;">
+                            <div class="result-box" style="background: white;">
+                                <div class="result-label">Gross (ΠΑΛΙΟ)</div>
+                                <div class="result-value" id="mem-old-gross">€20.000</div>
+                            </div>
+                            <div class="result-box" style="background: white;">
+                                <div class="result-label">Net (ΠΑΛΙΟ)</div>
+                                <div class="result-value" id="mem-old-net">€12.500</div>
+                            </div>
+                            <div class="result-box success">
+                                <div class="result-label">Διαφορά Net</div>
+                                <div class="result-value" id="mem-net-diff">+€1.784</div>
+                                <div class="result-sub">ετήσιο όφελος</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMPARISON SECTION -->
+        <section id="comparison" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📊</div>
+                    <div>
+                        <div class="card-title">Σύγκριση: Παλιό (50/50) vs Νέο Σύστημα</div>
+                        <div class="card-subtitle">Καθαρό όφελος για agents που ξεπερνούν το cap €50k</div>
+                    </div>
+                </div>
+
+                <div style="background: #e3f2fd; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.85rem;">
+                    <strong>ℹ️ Υπολογισμός:</strong> Ατομική επιχείρηση, χωρίς προκαταβολή φόρου (για καθαρή σύγκριση μεταξύ συστημάτων)
+                </div>
+
+                <div class="table-container">
+                    <table id="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>GCI</th>
+                                <th>Old Gross</th>
+                                <th>New Gross</th>
+                                <th>Old Net</th>
+                                <th>New Net</th>
+                                <th>Διαφορά</th>
+                                <th>Bonus</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCENARIOS SECTION -->
+        <section id="scenarios" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📋</div>
+                    <div>
+                        <div class="card-title">Σενάρια Πραγματικών Συνεργατών - 2026</div>
+                        <div class="card-subtitle">Realistic projections με βάση τις εκτιμήσεις</div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table id="scenarios-table">
+                        <thead>
+                            <tr>
+                                <th>Συνεργάτης</th>
+                                <th>Τύπος</th>
+                                <th>GCI</th>
+                                <th>Old Net</th>
+                                <th>New Net</th>
+                                <th>Διαφορά</th>
+                                <th>Μηνιαίο/12</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div class="results-grid" style="margin-top: 2rem;">
+                    <div class="result-box highlight">
+                        <div class="result-label">Συνολικό GCI</div>
+                        <div class="result-value" id="total-gci">€520.000</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Σύνολο Old Net</div>
+                        <div class="result-value" id="total-old">€175.062</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Σύνολο New Net</div>
+                        <div class="result-value" id="total-new">€179.862</div>
+                    </div>
+                    <div class="result-box success">
+                        <div class="result-label">Συνολική Διαφορά</div>
+                        <div class="result-value" id="total-diff">+€4.800</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PARAMETERS SECTION -->
+        <section id="parameters" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">⚙️</div>
+                    <div>
+                        <div class="card-title">Παράμετροι Συστήματος</div>
+                        <div class="card-subtitle">Νέο Σύστημα Αμοιβών 2026</div>
+                    </div>
+                </div>
+
+                <h3 style="color: var(--primary); margin: 1.5rem 0 1rem; font-family: 'Montserrat', sans-serif;">Individuals</h3>
+                <div class="param-grid">
+                    <div class="param-item">
+                        <span class="param-name">Cap</span>
+                        <span class="param-value">€50.000</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">Split πριν Cap</span>
+                        <span class="param-value">50/50</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">Split μετά Cap</span>
+                        <span class="param-value">80/20 ★</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">Desk Fee</span>
+                        <span class="param-value">€100/μήνα</span>
+                    </div>
+                </div>
+
+                <h3 style="color: var(--primary); margin: 1.5rem 0 1rem; font-family: 'Montserrat', sans-serif;">Team Leaders</h3>
+                <div class="param-grid">
+                    <div class="param-item">
+                        <span class="param-name">Cap</span>
+                        <span class="param-value">€50k + n×€35k</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">Minimum Cap</span>
+                        <span class="param-value">€75.000</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">Split πριν Cap</span>
+                        <span class="param-value">70/30</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">Split μετά Cap</span>
+                        <span class="param-value">90/10 ★</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">Override</span>
+                        <span class="param-value">20%</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">Desk Fee</span>
+                        <span class="param-value">€1.000/μήνα</span>
+                    </div>
+                </div>
+
+                <h3 style="color: var(--primary); margin: 1.5rem 0 1rem; font-family: 'Montserrat', sans-serif;">Team Members (Approach B)</h3>
+                <div class="param-grid">
+                    <div class="param-item">
+                        <span class="param-name">Split πριν Cap</span>
+                        <span class="param-value">50/20/30</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">Split μετά Cap</span>
+                        <span class="param-value">70/20/10 ★</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">Desk Fee</span>
+                        <span class="param-value">€100/μήνα</span>
+                    </div>
+                </div>
+
+                <h3 style="color: var(--primary); margin: 1.5rem 0 1rem; font-family: 'Montserrat', sans-serif;">Γενικές Παράμετροι</h3>
+                <div class="param-grid">
+                    <div class="param-item">
+                        <span class="param-name">ΕΦΚΑ</span>
+                        <span class="param-value">~€220/μήνα</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">RE/MAX Network</span>
+                        <span class="param-value">9%</span>
+                    </div>
+                </div>
+
+                <h3 style="color: var(--primary); margin: 1.5rem 0 1rem; font-family: 'Montserrat', sans-serif;">Φορολογία Ατομικής Επιχείρησης</h3>
+                <div class="param-grid">
+                    <div class="param-item">
+                        <span class="param-name">0 - €10.000</span>
+                        <span class="param-value">9%</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">€10.001 - €20.000</span>
+                        <span class="param-value">22%</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">€20.001 - €30.000</span>
+                        <span class="param-value">28%</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">€30.001 - €40.000</span>
+                        <span class="param-value">36%</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">€40.001+</span>
+                        <span class="param-value">44%</span>
+                    </div>
+                    <div class="param-item" style="border-left-color: var(--secondary);">
+                        <span class="param-name">Προκαταβολή Φόρου</span>
+                        <span class="param-value">55%</span>
+                    </div>
+                    <div class="param-item" style="border-left-color: var(--success);">
+                        <span class="param-name">Νέοι Επιτηδευματίες (3 έτη)</span>
+                        <span class="param-value">4,5% (αντί 9%)</span>
+                    </div>
+                </div>
+
+                <h3 style="color: var(--primary); margin: 1.5rem 0 1rem; font-family: 'Montserrat', sans-serif;">Φορολογία Ετερόρρυθμης Εταιρείας (ΕΕ)</h3>
+                <div class="param-grid">
+                    <div class="param-item">
+                        <span class="param-name">Φορολογικός Συντελεστής</span>
+                        <span class="param-value">22% flat</span>
+                    </div>
+                    <div class="param-item">
+                        <span class="param-name">Προκαταβολή</span>
+                        <span class="param-value">Δεν ισχύει</span>
+                    </div>
+                </div>
+
+                <div style="background: #fff3e0; padding: 1rem; border-radius: 10px; margin-top: 1.5rem; border-left: 4px solid #ff9800;">
+                    <strong>⚠️ Σημείωση:</strong> Στην Ατομική Επιχείρηση η φορολόγηση ξεκινά από το πρώτο ευρώ (δεν υπάρχει αφορολόγητο). Η προκαταβολή φόρου 55% καταβάλλεται μαζί με τον φόρο και συμψηφίζεται την επόμενη χρονιά.
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div style="margin-bottom: 0.5rem;">
+            <strong style="color: var(--secondary);">RE/MAX</strong> <strong>Delta Ktima</strong>
+        </div>
+        Compensation Calculator 2026 | Confidential | Larissa & Katerini
+    </footer>
+
+    <script>
+        // Constants
+        const PARAMS = {
+            indCap: 50000,  // Individual cap €50k
+            indSplitBefore: 0.50,
+            indSplitAfter: 0.80,
+            indDeskFee: 1200,
+            // Team Cap: €50k (TL) + n × €35k (per TM), minimum €75k
+            tlBaseCap: 50000,      // TL base cap
+            tmCapContrib: 35000,   // Per team member contribution
+            minTeamCap: 75000,     // Minimum to avoid 1-person "teams"
+            tlSplitBefore: 0.70,
+            tlSplitAfter: 0.90,
+            tlOverride: 0.20,
+            tlDeskFee: 12000,
+            memSplitBeforeM: 0.50,
+            memSplitAfterM: 0.70,
+            memDeskFee: 1200,
+            efka: 2640 // ~220€/μήνα × 12
+        };
+
+        // Format currency
+        const fmt = (n) => '€' + Math.round(n).toLocaleString('el-GR');
+        const fmtPct = (n) => (n * 100).toFixed(1).replace('.', ',') + '%';
+
+        // Calculate tax - Ατομική Επιχείρηση (κλίμακα)
+        // isNewBusiness: 50% μείωση στον πρώτο συντελεστή (9%→4,5%) για 3 πρώτα έτη
+        function calcTaxAtomiki(income, isNewBusiness = false) {
+            const rate1 = isNewBusiness ? 0.045 : 0.09; // 4.5% ή 9%
+            let tax = 0;
+            
+            if (income <= 10000) {
+                tax = income * rate1;
+            } else if (income <= 20000) {
+                tax = 10000 * rate1 + (income - 10000) * 0.22;
+            } else if (income <= 30000) {
+                tax = 10000 * rate1 + 10000 * 0.22 + (income - 20000) * 0.28;
+            } else if (income <= 40000) {
+                tax = 10000 * rate1 + 10000 * 0.22 + 10000 * 0.28 + (income - 30000) * 0.36;
+            } else {
+                tax = 10000 * rate1 + 10000 * 0.22 + 10000 * 0.28 + 10000 * 0.36 + (income - 40000) * 0.44;
+            }
+            return tax;
+        }
+
+        // Calculate tax - Ετερόρρυθμη Εταιρεία (22% flat)
+        function calcTaxEE(income) {
+            return income * 0.22;
+        }
+
+        // Calculate total tax with prepayment (προκαταβολή)
+        // prepaymentRate: 55% κανονικά, 50% για πρώτο έτος
+        function calcTotalTax(income, taxType = 'atomiki', isNewBusiness = false, prepaymentRate = 0.55) {
+            let baseTax;
+            if (taxType === 'ee') {
+                baseTax = calcTaxEE(income);
+            } else {
+                baseTax = calcTaxAtomiki(income, isNewBusiness);
+            }
+            const prepayment = baseTax * prepaymentRate;
+            return { baseTax, prepayment, total: baseTax + prepayment };
+        }
+
+        // Legacy function for comparison tables (uses standard atomiki)
+        function calcTax(income) {
+            return calcTaxAtomiki(income, false);
+        }
+
+        // Calculate Individual
+        function calcIndividual() {
+            const gci = parseFloat(document.getElementById('ind-gci').value) || 0;
+            const taxType = document.getElementById('ind-tax-type').value;
+            const isNewBusiness = document.getElementById('ind-new-business').checked;
+            const prepaymentRate = parseFloat(document.getElementById('ind-prepayment').value);
+            
+            // Show/hide new business option based on tax type
+            document.getElementById('ind-new-business-group').style.display = taxType === 'atomiki' ? 'block' : 'none';
+            
+            // NEW SYSTEM calculations
+            const gciBefore = Math.min(gci, PARAMS.indCap);
+            const gciAfter = Math.max(0, gci - PARAMS.indCap);
+            const agentGross = gciBefore * PARAMS.indSplitBefore + gciAfter * PARAMS.indSplitAfter;
+            const officeGross = gciBefore * (1 - PARAMS.indSplitBefore) + gciAfter * (1 - PARAMS.indSplitAfter);
+            const taxable = agentGross - PARAMS.indDeskFee;
+            const taxResult = calcTotalTax(taxable, taxType, isNewBusiness, prepaymentRate);
+            const net = agentGross - PARAMS.indDeskFee - PARAMS.efka - taxResult.total;
+            
+            // OLD SYSTEM calculations (50/50 flat)
+            const oldGross = gci * 0.5;
+            const oldTaxable = oldGross - PARAMS.indDeskFee;
+            const oldTaxResult = calcTotalTax(oldTaxable, taxType, isNewBusiness, prepaymentRate);
+            const oldNet = oldGross - PARAMS.indDeskFee - PARAMS.efka - oldTaxResult.total;
+            
+            // Differences
+            const grossDiff = agentGross - oldGross;
+            const netDiff = net - oldNet;
+            const monthlyDiff = netDiff / 12;
+            
+            // Update NEW system fields
+            document.getElementById('ind-gci-before').textContent = fmt(gciBefore);
+            document.getElementById('ind-gci-after').textContent = fmt(gciAfter);
+            document.getElementById('ind-gross').textContent = fmt(agentGross);
+            document.getElementById('ind-office').textContent = fmt(officeGross);
+            document.getElementById('ind-tax-base').textContent = fmt(taxResult.baseTax);
+            document.getElementById('ind-tax-prepay').textContent = fmt(taxResult.prepayment);
+            document.getElementById('ind-prepay-rate').textContent = (prepaymentRate * 100) + '%';
+            document.getElementById('ind-tax-total').textContent = fmt(taxResult.total);
+            document.getElementById('ind-net').textContent = fmt(net);
+            document.getElementById('ind-monthly12').textContent = fmt(net / 12);
+            document.getElementById('ind-split').textContent = gci > 0 ? fmtPct(agentGross / gci) : '0%';
+            
+            // Update OLD system fields
+            document.getElementById('ind-gross-old').textContent = fmt(oldGross);
+            document.getElementById('ind-net-old').textContent = fmt(oldNet);
+            document.getElementById('ind-monthly12-old').textContent = fmt(oldNet / 12);
+            
+            // Update DIFFERENCE fields
+            document.getElementById('ind-gross-diff').textContent = grossDiff >= 0 ? '+' + fmt(grossDiff) : fmt(grossDiff);
+            document.getElementById('ind-gross-diff').parentElement.className = grossDiff >= 0 ? 'result-box success' : 'result-box';
+            
+            document.getElementById('ind-net-diff').textContent = netDiff >= 0 ? '+' + fmt(netDiff) : fmt(netDiff);
+            document.getElementById('ind-net-diff').parentElement.className = netDiff >= 0 ? 'result-box success' : 'result-box';
+            
+            document.getElementById('ind-monthly-diff').textContent = monthlyDiff >= 0 ? '+' + fmt(monthlyDiff) : fmt(monthlyDiff);
+            document.getElementById('ind-monthly-diff').parentElement.className = monthlyDiff >= 0 ? 'result-box success' : 'result-box';
+        }
+
+        // Calculate Team Leader
+        function calcTeamLeader() {
+            const tlGci = parseFloat(document.getElementById('tl-gci').value) || 0;
+            const numMembers = parseInt(document.getElementById('tl-members').value) || 1;
+            const m1 = parseFloat(document.getElementById('tl-m1').value) || 0;
+            const m2 = parseFloat(document.getElementById('tl-m2').value) || 0;
+            const m3 = parseFloat(document.getElementById('tl-m3').value) || 0;
+            const m4 = parseFloat(document.getElementById('tl-m4').value) || 0;
+            const taxType = document.getElementById('tl-tax-type').value;
+            const prepaymentRate = parseFloat(document.getElementById('tl-prepayment').value);
+            
+            const memberGci = m1 + m2 + m3 + m4;
+            const headcount = 1 + numMembers;
+            // New cap formula: €50k (TL) + n × €35k (per TM), minimum €75k
+            const teamCap = Math.max(PARAMS.minTeamCap, PARAMS.tlBaseCap + numMembers * PARAMS.tmCapContrib);
+            const totalGci = tlGci + memberGci;
+            const passesCap = totalGci > teamCap;
+            
+            // NEW SYSTEM: Override + better splits
+            const overrideIncome = memberGci * PARAMS.tlOverride;
+            
+            // Proportional allocation based on team total vs cap
+            let tlGciBefore, tlGciAfter;
+            if (totalGci <= teamCap) {
+                tlGciBefore = tlGci;
+                tlGciAfter = 0;
+            } else {
+                tlGciBefore = tlGci * teamCap / totalGci;
+                tlGciAfter = tlGci - tlGciBefore;
+            }
+            
+            const tlBefore = tlGciBefore * PARAMS.tlSplitBefore;
+            const tlAfter = tlGciAfter * PARAMS.tlSplitAfter;
+            const tlGross = tlBefore + tlAfter + overrideIncome;
+            const taxable = tlGross - PARAMS.tlDeskFee;
+            const taxResult = calcTotalTax(taxable, taxType, false, prepaymentRate);
+            const net = tlGross - PARAMS.tlDeskFee - PARAMS.efka - taxResult.total;
+            
+            // OLD SYSTEM: 70/30 flat, NO override, desk fee €1000/month
+            const oldGross = tlGci * 0.7; // 70% of own GCI
+            const oldTaxable = oldGross - PARAMS.tlDeskFee; // TL desk fee €12k/year
+            const oldTaxResult = calcTotalTax(oldTaxable, taxType, false, prepaymentRate);
+            const oldNet = oldGross - PARAMS.tlDeskFee - PARAMS.efka - oldTaxResult.total;
+            
+            // Difference
+            const netDiff = net - oldNet;
+            
+            // Update NEW system fields
+            document.getElementById('tl-headcount').textContent = headcount;
+            document.getElementById('tl-cap').textContent = fmt(teamCap);
+            document.getElementById('tl-total').textContent = fmt(totalGci);
+            document.getElementById('tl-pass').textContent = passesCap ? 'ΝΑΙ ★' : 'ΟΧΙ';
+            document.getElementById('tl-pass').style.color = passesCap ? '#28a745' : '#666';
+            document.getElementById('tl-override').textContent = fmt(overrideIncome);
+            document.getElementById('tl-gross').textContent = fmt(tlGross);
+            document.getElementById('tl-tax-base').textContent = fmt(taxResult.baseTax);
+            document.getElementById('tl-tax-prepay').textContent = fmt(taxResult.prepayment);
+            document.getElementById('tl-tax-total').textContent = fmt(taxResult.total);
+            document.getElementById('tl-net').textContent = fmt(net);
+            document.getElementById('tl-monthly').textContent = fmt(net / 12);
+            
+            // Update OLD system fields
+            document.getElementById('tl-old-gross').textContent = fmt(oldGross);
+            document.getElementById('tl-old-net').textContent = fmt(oldNet);
+            
+            // Update difference
+            document.getElementById('tl-net-diff').textContent = netDiff >= 0 ? '+' + fmt(netDiff) : fmt(netDiff);
+            document.getElementById('tl-net-diff').parentElement.className = netDiff >= 0 ? 'result-box success' : 'result-box';
+        }
+
+        // Calculate Team Member
+        function calcTeamMember() {
+            const memGci = parseFloat(document.getElementById('mem-gci').value) || 0;
+            const teamCap = parseFloat(document.getElementById('mem-cap').value) || 200000;
+            const teamTotal = parseFloat(document.getElementById('mem-total').value) || 200000;
+            
+            const passesCap = teamTotal > teamCap;
+            
+            // NEW SYSTEM calculations
+            let gciBefore, gciAfter;
+            if (teamTotal <= teamCap) {
+                gciBefore = memGci;
+                gciAfter = 0;
+            } else {
+                gciBefore = memGci * teamCap / teamTotal;
+                gciAfter = memGci - gciBefore;
+            }
+            
+            const grossBefore = gciBefore * PARAMS.memSplitBeforeM;
+            const grossAfter = gciAfter * PARAMS.memSplitAfterM;
+            const memGross = grossBefore + grossAfter;
+            
+            const toTl = gciBefore * 0.20 + gciAfter * 0.20;
+            const toOffice = gciBefore * 0.30 + gciAfter * 0.10;
+            
+            const taxable = memGross - PARAMS.memDeskFee;
+            const taxResult = calcTotalTax(taxable, 'atomiki', false, 0.55);
+            const net = memGross - PARAMS.memDeskFee - PARAMS.efka - taxResult.total;
+            
+            // OLD SYSTEM: 50/50 flat as individual
+            const oldGross = memGci * 0.5;
+            const oldTaxable = oldGross - PARAMS.indDeskFee;
+            const oldTaxResult = calcTotalTax(oldTaxable, 'atomiki', false, 0.55);
+            const oldNet = oldGross - PARAMS.indDeskFee - PARAMS.efka - oldTaxResult.total;
+            
+            // Difference
+            const netDiff = net - oldNet;
+            
+            // Update NEW system fields
+            document.getElementById('mem-pass').textContent = passesCap ? 'ΝΑΙ ★' : 'ΟΧΙ';
+            document.getElementById('mem-pass').style.color = passesCap ? '#28a745' : '#666';
+            document.getElementById('mem-gross').textContent = fmt(memGross);
+            document.getElementById('mem-to-tl').textContent = fmt(toTl);
+            document.getElementById('mem-to-office').textContent = fmt(toOffice);
+            document.getElementById('mem-tax').textContent = fmt(taxResult.total);
+            document.getElementById('mem-net').textContent = fmt(net);
+            document.getElementById('mem-monthly').textContent = fmt(net / 12);
+            document.getElementById('mem-split').textContent = memGci > 0 ? fmtPct(memGross / memGci) : '0%';
+            
+            // Update OLD system fields
+            document.getElementById('mem-old-gross').textContent = fmt(oldGross);
+            document.getElementById('mem-old-net').textContent = fmt(oldNet);
+            
+            // Update difference
+            document.getElementById('mem-net-diff').textContent = netDiff >= 0 ? '+' + fmt(netDiff) : fmt(netDiff);
+            document.getElementById('mem-net-diff').parentElement.className = netDiff >= 0 ? 'result-box success' : 'result-box';
+        }
+
+        // Build comparison table
+        function buildComparisonTable() {
+            const gciLevels = [30000, 40000, 50000, 60000, 70000, 80000, 90000, 100000, 120000];
+            const tbody = document.querySelector('#comparison-table tbody');
+            tbody.innerHTML = '';
+            
+            gciLevels.forEach(gci => {
+                const oldGross = gci * 0.5;
+                const newGross = Math.min(gci, 50000) * 0.5 + Math.max(0, gci - 50000) * 0.8;
+                
+                // Using standard atomiki tax without prepayment for comparison
+                const oldTax = calcTaxAtomiki(oldGross - 1200, false);
+                const newTax = calcTaxAtomiki(newGross - 1200, false);
+                
+                const oldNet = oldGross - 1200 - 2640 - oldTax;
+                const newNet = newGross - 1200 - 2640 - newTax;
+                const diff = newNet - oldNet;
+                
+                const isHighlight = gci >= 60000;
+                const tr = document.createElement('tr');
+                if (isHighlight) tr.className = 'highlight-row';
+                
+                tr.innerHTML = `
+                    <td><strong>${fmt(gci)}</strong></td>
+                    <td>${fmt(oldGross)}</td>
+                    <td>${fmt(newGross)}</td>
+                    <td>${fmt(oldNet)}</td>
+                    <td><strong>${fmt(newNet)}</strong></td>
+                    <td style="color: ${diff > 0 ? '#28a745' : '#666'}"><strong>${diff > 0 ? '+' : ''}${fmt(diff)}</strong></td>
+                    <td>${diff > 0 ? '<span class="bonus-badge">✓ +' + fmt(diff).replace('€', '') + '</span>' : '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Build scenarios table
+        function buildScenariosTable() {
+            const agents = [
+                { name: 'ΠΑΠΑΚΩΝΣΤΑΝΤΙΝΟΥ', type: 'Individual', gci: 70000 },
+                { name: 'ΤΑΡΑΝΤΙΛΗΣ', type: 'Individual', gci: 70000 },
+                { name: 'ΒΑΛΙΑΚΟΣ', type: 'Individual', gci: 65000 },
+                { name: 'Κ.ΠΑΠΑΔΟΠΟΥΛΟΣ', type: 'Individual', gci: 60000 },
+                { name: 'ΚΟΖΙΚΟΠΟΥΛΟΣ', type: 'Individual', gci: 55000 },
+                { name: 'ΠΙΠΙΛΑΣ', type: 'Individual', gci: 50000 },
+                { name: 'ΓΕΩΡΓΑΚΑΚΗ', type: 'Individual', gci: 45000 },
+                { name: 'ΜΟΥΤΣΙΟΣ', type: 'Individual', gci: 40000 },
+                { name: 'ΤΖΗΜΑΣ', type: 'Individual', gci: 35000 },
+                { name: 'ΣΚΟΥΜΠΡΗΣ', type: 'Individual', gci: 30000 }
+            ];
+            
+            const tbody = document.querySelector('#scenarios-table tbody');
+            tbody.innerHTML = '';
+            
+            let totalGci = 0, totalOld = 0, totalNew = 0;
+            
+            agents.forEach(agent => {
+                const gci = agent.gci;
+                const oldGross = gci * 0.5;
+                const newGross = Math.min(gci, 50000) * 0.5 + Math.max(0, gci - 50000) * 0.8;
+                
+                // Using standard atomiki tax without prepayment for comparison
+                const oldNet = oldGross - 1200 - 2640 - calcTaxAtomiki(oldGross - 1200, false);
+                const newNet = newGross - 1200 - 2640 - calcTaxAtomiki(newGross - 1200, false);
+                const diff = newNet - oldNet;
+                
+                totalGci += gci;
+                totalOld += oldNet;
+                totalNew += newNet;
+                
+                const isHighlight = gci >= 55000;
+                const tr = document.createElement('tr');
+                if (isHighlight) tr.className = 'highlight-row';
+                
+                tr.innerHTML = `
+                    <td><strong>${agent.name}</strong></td>
+                    <td>${agent.type}</td>
+                    <td>${fmt(gci)}</td>
+                    <td>${fmt(oldNet)}</td>
+                    <td><strong>${fmt(newNet)}</strong></td>
+                    <td style="color: ${diff > 0 ? '#28a745' : '#666'}">${diff > 0 ? '+' : ''}${fmt(diff)}</td>
+                    <td>${fmt(newNet / 12)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            document.getElementById('total-gci').textContent = fmt(totalGci);
+            document.getElementById('total-old').textContent = fmt(totalOld);
+            document.getElementById('total-new').textContent = fmt(totalNew);
+            document.getElementById('total-diff').textContent = '+' + fmt(totalNew - totalOld);
+        }
+
+        // Tab navigation
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Event listeners
+        document.getElementById('ind-gci').addEventListener('input', calcIndividual);
+        document.getElementById('ind-tax-type').addEventListener('change', calcIndividual);
+        document.getElementById('ind-new-business').addEventListener('change', calcIndividual);
+        document.getElementById('ind-prepayment').addEventListener('change', calcIndividual);
+        ['tl-gci', 'tl-members', 'tl-m1', 'tl-m2', 'tl-m3', 'tl-m4'].forEach(id => {
+            document.getElementById(id).addEventListener('input', calcTeamLeader);
+        });
+        document.getElementById('tl-tax-type').addEventListener('change', calcTeamLeader);
+        document.getElementById('tl-prepayment').addEventListener('change', calcTeamLeader);
+        ['mem-gci', 'mem-cap', 'mem-total'].forEach(id => {
+            document.getElementById(id).addEventListener('input', calcTeamMember);
+        });
+
+        // Initialize
+        calcIndividual();
+        calcTeamLeader();
+        calcTeamMember();
+        buildComparisonTable();
+        buildScenariosTable();
+    </script>
+</body>
+</html>
