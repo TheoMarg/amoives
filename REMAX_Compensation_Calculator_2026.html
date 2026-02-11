@@ -391,7 +391,7 @@ const teamPresets = [
 ];
 
 function saveCurrentTeam() {
-  const idx = parseInt(document.getElementById('teamSelect').value);
+  const idx = currentTeamIdx;
   teamPresets[idx].name = document.getElementById('tName').value;
   teamPresets[idx].stage = document.getElementById('tStage').value;
   teamPresets[idx].tlGCI = parseFloat(document.getElementById('tlGCI').value)||0;
@@ -401,7 +401,8 @@ function saveCurrentTeam() {
 function loadTeam(idx) {
   // Save current before switching
   saveCurrentTeam();
-  const t = teamPresets[idx];
+  currentTeamIdx = parseInt(idx);
+  const t = teamPresets[currentTeamIdx];
   document.getElementById('tName').value = t.name;
   document.getElementById('tStage').value = t.stage;
   document.getElementById('tlGCI').value = t.tlGCI;
@@ -410,6 +411,7 @@ function loadTeam(idx) {
   recalc();
 }
 
+let currentTeamIdx = 0;
 let members = [
   {n:'TM Γιαννάκος 1', g:0},
   {n:'TM Γιαννάκος 2', g:0},
