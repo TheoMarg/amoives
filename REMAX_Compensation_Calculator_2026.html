@@ -152,6 +152,29 @@
   .footer strong { color: var(--text); }
 
   .split-visual { display: flex; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 6px; }
+
+  /* Tooltips */
+  .tip { position: relative; cursor: help; border-bottom: 1px dashed rgba(0,0,0,0.2); }
+  .tip:hover::after {
+    content: attr(data-tip);
+    position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+    background: #1a1a2e; color: #fff; padding: 10px 14px; border-radius: 8px;
+    font-size: 0.78rem; font-weight: 500; line-height: 1.5;
+    white-space: pre-line; width: max-content; max-width: 340px;
+    z-index: 999; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    pointer-events: none;
+  }
+  .tip:hover::before {
+    content: ''; position: absolute; bottom: calc(100% + 2px); left: 50%; transform: translateX(-50%);
+    border: 6px solid transparent; border-top-color: #1a1a2e; z-index: 999;
+  }
+  /* Flip tooltip up on cells near bottom */
+  tr:last-child .tip:hover::after, tr:nth-last-child(2) .tip:hover::after {
+    bottom: auto; top: calc(100% + 8px);
+  }
+  tr:last-child .tip:hover::before, tr:nth-last-child(2) .tip:hover::before {
+    bottom: auto; top: calc(100% + 2px); border-top-color: transparent; border-bottom-color: #1a1a2e;
+  }
 </style>
 </head>
 <body>
@@ -163,7 +186,8 @@
 </div>
 
 <div class="tabs">
-  <button class="tab active" onclick="showTab('calc')">🧮 Υπολογισμός</button>
+  <button class="tab active" onclick="showTab('calc')">🧮 Teams</button>
+  <button class="tab" onclick="showTab('individual')">👤 Individual</button>
   <button class="tab" onclick="showTab('compare')">📊 Σύγκριση</button>
   <button class="tab" onclick="showTab('params')">⚙️ Παράμετροι</button>
 </div>
@@ -251,6 +275,103 @@
   </div>
 </div>
 
+<!-- ========== TAB: INDIVIDUAL ========== -->
+<div id="individual" class="panel">
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">👤</span>
+      <h2>Υπολογιστής Individual Agent</h2>
+      <span class="card-sub">3 Σκαλιά — Prospective Split</span>
+    </div>
+    <div class="card-body">
+      <div class="form-row">
+        <div class="field"><label>Όνομα Agent</label><input id="iName" value="Agent 1" onchange="calcInd()"></div>
+        <div class="field"><label>Ετήσιο GCI (€)</label><input type="number" id="iGCI" value="70000" onchange="calcInd()"><div class="hint">Σωρευτικό Gross Commission Income</div></div>
+      </div>
+
+      <div class="section-title">Σκαλιά Split (Agent / Office)</div>
+      <p style="font-size:.82rem;color:var(--muted);margin-bottom:10px;">Μόλις ο agent ξεπεράσει το κατώφλι, κάθε μελλοντικό deal μπαίνει με το νέο split.</p>
+      <div class="form-row thirds">
+        <div class="field"><label>Σκαλί 1 — έως (€)</label><input type="number" id="iT1" value="35000" onchange="calcInd()"><div class="hint">Split: 50/50</div></div>
+        <div class="field"><label>Σκαλί 2 — έως (€)</label><input type="number" id="iT2" value="55000" onchange="calcInd()"><div class="hint">Split: 60/40</div></div>
+        <div class="field"><label>Σκαλί 3 — πάνω από</label><div style="padding:10px 12px;background:var(--output-bg);border-radius:8px;font-weight:700;font-size:.95rem;text-align:center;" id="i-t3label">€55.000+</div><div class="hint">Split: 70/30</div></div>
+      </div>
+      <div class="form-row thirds">
+        <div class="field"><label>Agent % Σκαλί 1</label><input type="number" id="iS1" value="0.50" step="0.01" onchange="calcInd()"></div>
+        <div class="field"><label>Agent % Σκαλί 2</label><input type="number" id="iS2" value="0.60" step="0.01" onchange="calcInd()"></div>
+        <div class="field"><label>Agent % Σκαλί 3</label><input type="number" id="iS3" value="0.70" step="0.01" onchange="calcInd()"></div>
+      </div>
+      <div class="form-row">
+        <div class="field"><label>RE/MAX %</label><input type="number" id="iRMX" value="0.09" step="0.01" onchange="calcInd()"></div>
+        <div class="field"><label>Desk Fee (€/μήνα)</label><input type="number" id="iDesk" value="100" onchange="calcInd()"></div>
+      </div>
+
+      <!-- Visual split bar -->
+      <div class="output-row thirds" style="margin-top:10px;">
+        <div class="out-cell"><span class="out-label">Office % Σκαλί 1</span><span class="out-val" id="i-off1"></span></div>
+        <div class="out-cell"><span class="out-label">Office % Σκαλί 2</span><span class="out-val" id="i-off2"></span></div>
+        <div class="out-cell"><span class="out-label">Office % Σκαλί 3</span><span class="out-val" id="i-off3"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INDIVIDUAL RESULTS -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">💰</span>
+      <h2>Αποτελέσματα</h2>
+      <span class="card-sub" id="i-sub"></span>
+    </div>
+    <div class="card-body">
+
+      <div class="output-row thirds">
+        <div class="out-cell"><span class="out-label">Τρέχον Σκαλί</span><span class="out-val" id="i-tier"></span></div>
+        <div class="out-cell"><span class="out-label">Τρέχον Split</span><span class="out-val" id="i-curSplit"></span></div>
+        <div class="out-cell"><span class="out-label">Επόμενο σκαλί σε</span><span class="out-val" id="i-nextIn"></span></div>
+      </div>
+
+      <div class="section-title">Ανάλυση ανά ζώνη</div>
+      <div id="i-zones"></div>
+
+      <hr class="divider">
+      <div class="section-title">Σύνολα</div>
+      <div class="metrics">
+        <div class="metric m-tl" id="i-mAgent"></div>
+        <div class="metric m-br" id="i-mOffice"></div>
+        <div class="metric m-rmx" id="i-mRMX"></div>
+        <div class="metric m-ok" id="i-mNet"></div>
+      </div>
+
+      <div class="output-row">
+        <div class="out-cell"><span class="out-label">- Desk Fee</span><span class="out-val" id="i-desk"></span></div>
+        <div class="out-cell highlight"><span class="out-label">Effective Split</span><span class="out-val" id="i-eff"></span></div>
+      </div>
+      <div class="output-row">
+        <div class="out-cell highlight"><span class="out-label">Καθαρά Agent /μήνα</span><span class="out-val" id="i-monthly"></span></div>
+        <div class="out-cell"><span class="out-label">Έσοδα Γραφείου (Office + Fee)</span><span class="out-val" id="i-offTotal"></span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INDIVIDUAL COMPARISON TABLE -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">📊</span>
+      <h2>Quick Compare — Διαφορετικά GCI</h2>
+      <span class="card-sub">Πώς αλλάζει το εισόδημα ανάλογα GCI</span>
+    </div>
+    <div class="card-body">
+      <table>
+        <thead><tr><th>GCI</th><th>Σκαλί</th><th>Agent Gross</th><th>- Fee</th><th>Agent Net</th><th>/μήνα</th><th>Office (+ Fee)</th><th>RE/MAX</th><th>Eff. Split</th></tr></thead>
+        <tbody id="i-cmpBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
 <!-- ========== TAB 2: ΣΥΓΚΡΙΣΗ ========== -->
 <div id="compare" class="panel">
 
@@ -294,6 +415,30 @@
         <thead><tr><th>Ομάδα</th><th>Γραφείο (με bonus)</th><th>Γραφείο (χωρίς bonus)</th><th>Διαφορά</th></tr></thead>
         <tbody id="dbr-body"></tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- DESK FEES CARD -->
+  <div class="card">
+    <div class="card-head">
+      <span class="card-icon">🏢</span>
+      <h2>Πάγια Έσοδα Γραφείου — Desk Fees</h2>
+      <span class="card-sub">Σταθερό μηνιαίο εισόδημα ανεξαρτήτως πωλήσεων</span>
+    </div>
+    <div class="card-body">
+      <div class="form-row">
+        <div class="field"><label>Αριθμός Individual Agents</label><input type="number" id="indCount" value="10" onchange="renderCompare()"><div class="hint">Agents εκτός ομάδων</div></div>
+        <div class="field"><label>Desk Fee Individual (€/μήνα)</label><input type="number" id="indFeeMonth" value="100" onchange="renderCompare()"></div>
+      </div>
+
+      <div class="section-title">Αναλυτικός πίνακας</div>
+      <table>
+        <thead><tr><th style="text-align:left;">Κατηγορία</th><th>Άτομα</th><th>Fee/μήνα</th><th>Μηνιαίο</th><th>Ετήσιο</th></tr></thead>
+        <tbody id="fees-body"></tbody>
+        <tfoot id="fees-foot"></tfoot>
+      </table>
+
+      <div class="metrics" id="fees-metrics" style="margin-top:16px;"></div>
     </div>
   </div>
 </div>
@@ -343,16 +488,16 @@
       <div id="chk_C" style="font-size:.8rem;font-weight:600;margin-top:4px;"></div>
 
       <hr class="divider">
-      <div class="section-title">Τέλη (€/έτος)</div>
+      <div class="section-title">Τέλη (€/μήνα)</div>
       <div class="form-row thirds">
-        <div class="field"><label>Τέλος TL — A</label><input type="number" id="A_feeTL" value="100" onchange="recalc()"></div>
-        <div class="field"><label>Τέλος TL — B</label><input type="number" id="B_feeTL" value="450" onchange="recalc()"></div>
-        <div class="field"><label>Τέλος TL — C</label><input type="number" id="C_feeTL" value="800" onchange="recalc()"></div>
+        <div class="field"><label>Τέλος TL — A /μήνα</label><input type="number" id="A_feeTL" value="100" onchange="recalc()"></div>
+        <div class="field"><label>Τέλος TL — B /μήνα</label><input type="number" id="B_feeTL" value="450" onchange="recalc()"></div>
+        <div class="field"><label>Τέλος TL — C /μήνα</label><input type="number" id="C_feeTL" value="800" onchange="recalc()"></div>
       </div>
       <div class="form-row thirds">
-        <div class="field"><label>Τέλος TM — A</label><input type="number" id="A_feeTM" value="100" onchange="recalc()"></div>
-        <div class="field"><label>Τέλος TM — B</label><input type="number" id="B_feeTM" value="100" onchange="recalc()"></div>
-        <div class="field"><label>Τέλος TM — C</label><input type="number" id="C_feeTM" value="100" onchange="recalc()"></div>
+        <div class="field"><label>Τέλος TM — A /μήνα</label><input type="number" id="A_feeTM" value="100" onchange="recalc()"></div>
+        <div class="field"><label>Τέλος TM — B /μήνα</label><input type="number" id="B_feeTM" value="100" onchange="recalc()"></div>
+        <div class="field"><label>Τέλος TM — C /μήνα</label><input type="number" id="C_feeTM" value="100" onchange="recalc()"></div>
       </div>
 
       <hr class="divider">
@@ -382,6 +527,7 @@
 <script>
 const fmt = n => '€' + Math.round(n).toLocaleString('el-GR');
 const pct = n => (n*100).toFixed(1) + '%';
+const tip = (val, expl) => `<span class="tip" data-tip="${expl}">${val}</span>`;
 
 const teamPresets = [
   {name:'Team Γιαννάκος', stage:'A', tlGCI:0, members:[{n:'TM Γιαννάκος 1',g:0},{n:'TM Γιαννάκος 2',g:0},{n:'TM Γιαννάκος 3',g:0}]},
@@ -390,12 +536,13 @@ const teamPresets = [
   {name:'Team Μάνης', stage:'A', tlGCI:0, members:[{n:'TM Μάνης 1',g:0}]},
 ];
 
+let currentTeamIdx = 0;
+
 function saveCurrentTeam() {
-  const idx = currentTeamIdx;
-  teamPresets[idx].name = document.getElementById('tName').value;
-  teamPresets[idx].stage = document.getElementById('tStage').value;
-  teamPresets[idx].tlGCI = parseFloat(document.getElementById('tlGCI').value)||0;
-  teamPresets[idx].members = members.map(m => ({...m}));
+  teamPresets[currentTeamIdx].name = document.getElementById('tName').value;
+  teamPresets[currentTeamIdx].stage = document.getElementById('tStage').value;
+  teamPresets[currentTeamIdx].tlGCI = parseFloat(document.getElementById('tlGCI').value)||0;
+  teamPresets[currentTeamIdx].members = members.map(m => ({...m}));
 }
 
 function loadTeam(idx) {
@@ -411,7 +558,6 @@ function loadTeam(idx) {
   recalc();
 }
 
-let currentTeamIdx = 0;
 let members = [
   {n:'TM Γιαννάκος 1', g:0},
   {n:'TM Γιαννάκος 2', g:0},
@@ -423,9 +569,11 @@ let scenarios = [];
 function v(id, fb) { const el=document.getElementById(id); return el?(parseFloat(el.value)||0):fb; }
 
 function S(stage) {
+  const feeTLm = v(stage+'_feeTL'), feeTMm = v(stage+'_feeTM');
   return {
     tm:v(stage+'_tm'), tl:v(stage+'_tl'), br:v(stage+'_br'), rmx:v(stage+'_rmx'),
-    feeTL:v(stage+'_feeTL'), feeTM:v(stage+'_feeTM')
+    feeTL: feeTLm*12, feeTM: feeTMm*12,
+    feeTLm, feeTMm
   };
 }
 
@@ -526,10 +674,15 @@ function recalc() {
   document.getElementById('r-gci').textContent = fmt(r.teamGCI);
 
   // Metrics
+  const tlNetTip = r.n>0
+    ? `Override: ${fmt(r.details.reduce((a,d)=>a+d.tlTake,0))}\n+ Προσωπικό: ${fmt(r.tlPers)}\n- Τέλος TL: ${fmt(r.s.feeTLm)}/μήνα × 12 = ${fmt(r.s.feeTL)}\n= ${fmt(r.tlNet)}`
+    : `Προσωπικό: ${fmt(r.tlPers)}\n- Τέλος TL: ${fmt(r.s.feeTLm)}/μήνα × 12 = ${fmt(r.s.feeTL)}\n= ${fmt(r.tlNet)}`;
+  const tmNetTip = `Σύνολο TM Gross: ${fmt(r.details.reduce((a,d)=>a+d.tmTake,0))}\n- Τέλη ${r.n} μελών: ${r.n} × ${fmt(r.s.feeTMm)}/μήνα × 12 = ${fmt(r.n*r.s.feeTM)}\n= ${fmt(r.tmNet)}`;
+  const offTip = `Commission: ${fmt(r.brTot)}\n+ Τέλη: ${fmt(r.fees)}\n= ${fmt(r.office)}`;
   document.getElementById('r-metrics').innerHTML = `
-    <div class="metric m-tl"><div class="m-val">${fmt(r.tlNet)}</div><div class="m-label">Αρχηγός Net</div></div>
-    <div class="metric m-tm"><div class="m-val">${fmt(r.tmNet)}</div><div class="m-label">Μέλη Net</div></div>
-    <div class="metric m-br"><div class="m-val">${fmt(r.office)}</div><div class="m-label">Έσοδα Γραφείου</div></div>
+    <div class="metric m-tl"><div class="m-val">${tip(fmt(r.tlNet), tlNetTip)}</div><div class="m-label">Αρχηγός Net</div></div>
+    <div class="metric m-tm"><div class="m-val">${tip(fmt(r.tmNet), tmNetTip)}</div><div class="m-label">Μέλη Net</div></div>
+    <div class="metric m-br"><div class="m-val">${tip(fmt(r.office), offTip)}</div><div class="m-label">Έσοδα Γραφείου</div></div>
     <div class="metric m-rmx"><div class="m-val">${fmt(r.rmxTot)}</div><div class="m-label">RE/MAX</div></div>
     ${r.exits>0?`<div class="metric m-warn"><div class="m-val">${r.exits}</div><div class="m-label">Υποψ. Αποχώρησης</div></div>`:''}
   `;
@@ -540,49 +693,67 @@ function recalc() {
   if(r.n > 0) {
     tt.style.display = '';
     // Per-TM summary cards
-    const tmCards = r.details.filter(d=>d.gci>0).map(d => `
+    const tmCards = r.details.filter(d=>d.gci>0).map(d => {
+      const netTip = `${fmt(d.gci)} × ${pct(d.tmE)} = ${fmt(d.tmTake)}\n- Τέλος: ${fmt(r.s.feeTMm)}/μήνα × 12 = ${fmt(r.s.feeTM)}\n= ${fmt(d.tmNet1)}`;
+      const moTip = `${fmt(d.tmNet1)} ÷ 12 = ${fmt(d.monthly)}`;
+      const effTip = `${fmt(d.tmNet1)} ÷ ${fmt(d.gci)} = ${pct(d.effSplit)}`;
+      return `
       <div style="border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;">
         <div style="font-size:.82rem;font-weight:700;color:var(--muted);margin-bottom:4px;">${d.name}</div>
-        <div style="font-size:1.3rem;font-weight:800;color:var(--tm-color);">${fmt(d.tmNet1)}</div>
+        <div style="font-size:1.3rem;font-weight:800;color:var(--tm-color);">${tip(fmt(d.tmNet1), netTip)}</div>
         <div style="font-size:.72rem;color:var(--muted);">καθαρά/έτος</div>
-        <div style="font-size:.9rem;font-weight:700;color:var(--text);margin-top:4px;">${fmt(d.monthly)}<span style="font-size:.72rem;color:var(--muted);"> /μήνα</span></div>
+        <div style="font-size:.9rem;font-weight:700;color:var(--text);margin-top:4px;">${tip(fmt(d.monthly), moTip)}<span style="font-size:.72rem;color:var(--muted);"> /μήνα</span></div>
         <div style="margin-top:6px;">
-          <span style="font-size:.72rem;background:var(--tm-bg);color:var(--tm-color);padding:2px 8px;border-radius:10px;font-weight:700;">Effective ${pct(d.effSplit)}</span>
+          <span style="font-size:.72rem;background:var(--tm-bg);color:var(--tm-color);padding:2px 8px;border-radius:10px;font-weight:700;">${tip('Effective '+pct(d.effSplit), effTip)}</span>
         </div>
       </div>
-    `).join('');
+    `}).join('');
     
     tw.innerHTML = `
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px;">${tmCards}</div>
       <table>
       <thead><tr><th style="text-align:left;">Μέλος</th><th>GCI</th><th>Bonus</th><th>TM%</th><th>Μέλος Gross</th><th>- Τέλος</th><th style="background:var(--tm-color);">Καθαρά €</th><th style="background:var(--tm-color);">/μήνα</th><th>→ Γραφείο</th><th>→ RE/MAX</th><th>→ Αρχηγός</th><th></th></tr></thead>
-      <tbody>${r.details.map(d=>`<tr>
+      <tbody>${r.details.map(d=>{
+        const tmPctTip = d.cap>0 ? `Βάση ${pct(r.s.tm)} + Bonus +${d.cap}% = ${pct(d.tmE)}` : `Βάση ${pct(r.s.tm)} (χωρίς bonus)`;
+        const grossTip = `${fmt(d.gci)} × ${pct(d.tmE)} = ${fmt(d.tmTake)}`;
+        const netTip = `${fmt(d.tmTake)} - ${fmt(r.s.feeTMm)}/μήνα × 12 = ${fmt(d.tmNet1)}`;
+        const moTip = `${fmt(d.tmNet1)} ÷ 12 = ${fmt(d.monthly)}`;
+        const brTip = `${fmt(d.gci)} × ${pct(r.s.br)} = ${fmt(d.brTake)}`;
+        const rxTip = `${fmt(d.gci)} × ${pct(r.s.rmx)} = ${fmt(d.rmxTake)}`;
+        const tlTip = d.cap>0
+          ? `${fmt(d.gci)} × ${pct(d.tlE)} (${pct(r.s.tl)} - ${d.cap}% bonus) = ${fmt(d.tlTake)}`
+          : `${fmt(d.gci)} × ${pct(d.tlE)} = ${fmt(d.tlTake)}`;
+        return `<tr>
         <td class="left" style="font-weight:600;">${d.name}</td>
         <td>${fmt(d.gci)}</td>
         <td>${d.cap>0?`<b style="color:var(--tm-color);">+${d.cap}%</b>`:'—'}</td>
-        <td style="color:var(--tm-color);font-weight:700;">${pct(d.tmE)}</td>
-        <td>${fmt(d.tmTake)}</td>
-        <td style="color:var(--danger);">-${fmt(r.s.feeTM)}</td>
-        <td style="color:var(--tm-color);font-weight:800;font-size:.95rem;">${fmt(d.tmNet1)}</td>
-        <td style="color:var(--tm-color);font-weight:700;">${fmt(d.monthly)}</td>
-        <td style="color:var(--br-color);">${fmt(d.brTake)}</td>
-        <td>${fmt(d.rmxTake)}</td>
-        <td style="color:var(--tl-color);">${fmt(d.tlTake)}</td>
+        <td style="color:var(--tm-color);font-weight:700;">${tip(pct(d.tmE), tmPctTip)}</td>
+        <td>${tip(fmt(d.tmTake), grossTip)}</td>
+        <td style="color:var(--danger);">${tip('-'+fmt(r.s.feeTM), fmt(r.s.feeTMm)+'/μήνα × 12')}</td>
+        <td style="color:var(--tm-color);font-weight:800;font-size:.95rem;">${tip(fmt(d.tmNet1), netTip)}</td>
+        <td style="color:var(--tm-color);font-weight:700;">${tip(fmt(d.monthly), moTip)}</td>
+        <td style="color:var(--br-color);">${tip(fmt(d.brTake), brTip)}</td>
+        <td>${tip(fmt(d.rmxTake), rxTip)}</td>
+        <td style="color:var(--tl-color);">${tip(fmt(d.tlTake), tlTip)}</td>
         <td>${d.exit?'<span class="tag tag-exit">EXIT</span>':'<span class="tag tag-ok">OK</span>'}</td>
-      </tr>`).join('')}</tbody></table>`;
+      </tr>`}).join('')}</tbody></table>`;
   } else { tt.style.display='none'; tw.innerHTML='<p style="color:var(--muted);font-style:italic;">Μόνο αρχηγός — δεν υπάρχουν μέλη</p>'; }
 
   // TL personal
+  const tlPersTip = `${fmt(r.tg)} × (${pct(r.s.tm)} + ${pct(r.s.tl)}) = ${fmt(r.tg)} × ${pct(r.s.tm+r.s.tl)} = ${fmt(r.tlPers)}`;
+  const tlBrTip = `${fmt(r.tg)} × ${pct(r.s.br)} = ${fmt(r.tlPersBR)}`;
+  const tlRxTip = `${fmt(r.tg)} × ${pct(r.s.rmx)} = ${fmt(r.tlPersRMX)}`;
   document.getElementById('r-tl-gci').textContent = fmt(r.tg);
-  document.getElementById('r-tl-pers').textContent = fmt(r.tlPers);
-  document.getElementById('r-tl-br').textContent = fmt(r.tlPersBR);
-  document.getElementById('r-tl-rmx').textContent = fmt(r.tlPersRMX);
+  document.getElementById('r-tl-pers').innerHTML = tip(fmt(r.tlPers), tlPersTip);
+  document.getElementById('r-tl-br').innerHTML = tip(fmt(r.tlPersBR), tlBrTip);
+  document.getElementById('r-tl-rmx').innerHTML = tip(fmt(r.tlPersRMX), tlRxTip);
 
   // Fees & totals
-  document.getElementById('r-fee-tl').textContent = fmt(r.s.feeTL);
-  document.getElementById('r-fee-tm').textContent = fmt(r.n * r.s.feeTM);
+  document.getElementById('r-fee-tl').innerHTML = tip(fmt(r.s.feeTL), `${fmt(r.s.feeTLm)}/μήνα × 12 = ${fmt(r.s.feeTL)}/έτος`);
+  document.getElementById('r-fee-tm').innerHTML = tip(fmt(r.n * r.s.feeTM), `${r.n} μέλη × ${fmt(r.s.feeTMm)}/μήνα × 12 = ${fmt(r.n*r.s.feeTM)}/έτος`);
+  const tlNetFinalTip = `Override από μέλη: ${fmt(r.details.reduce((a,d)=>a+d.tlTake,0))}\n+ Προσωπικά: ${fmt(r.tlPers)}\n- Τέλος: ${fmt(r.s.feeTLm)}/μήνα × 12 = ${fmt(r.s.feeTL)}\n= ${fmt(r.tlNet)}\n÷ 12 = ${fmt(r.tlNet/12)}/μήνα`;
   document.getElementById('r-totals').innerHTML = `
-    <div class="metric m-tl"><div class="m-val">${fmt(r.tlNet)}</div><div class="m-label">Αρχηγός Net/έτος</div><div style="font-size:.82rem;margin-top:4px;">${fmt(r.tlNet/12)} /μήνα</div></div>
+    <div class="metric m-tl"><div class="m-val">${tip(fmt(r.tlNet), tlNetFinalTip)}</div><div class="m-label">Αρχηγός Net/έτος</div><div style="font-size:.82rem;margin-top:4px;">${fmt(r.tlNet/12)} /μήνα</div></div>
     <div class="metric m-tm"><div class="m-val">${fmt(r.tmNet)}</div><div class="m-label">Μέλη Net (σύνολο)</div></div>
     <div class="metric m-ok"><div class="m-val">${fmt(r.office)}</div><div class="m-label">Σύνολο εσόδων γραφείου</div></div>
   `;
@@ -614,18 +785,22 @@ function renderCompare() {
   });
 
   // Table
-  document.getElementById('cmp-body').innerHTML = all.map((r,i) => `<tr>
+  document.getElementById('cmp-body').innerHTML = all.map((r,i) => {
+    const tlTip2 = `Override: ${fmt(r.details.reduce((a,d)=>a+d.tlTake,0))}\n+ Προσωπικό: ${fmt(r.tlPers)}\n- Τέλος: ${fmt(r.s.feeTLm)}/μήνα × 12\n= ${fmt(r.tlNet)}`;
+    const tmTip2 = `Gross: ${fmt(r.details.reduce((a,d)=>a+d.tmTake,0))}\n- Τέλη: ${r.n} × ${fmt(r.s.feeTMm)}/μήνα × 12\n= ${fmt(r.tmNet)}`;
+    const offTip2 = `Commission: ${fmt(r.brTot)}\n+ Τέλη: ${fmt(r.fees)}\n= ${fmt(r.office)}`;
+    return `<tr>
     <td class="left" style="font-weight:700;">${r.name}${i===0?' <span class="tag tag-stage">τρέχον</span>':''}</td>
     <td><span class="tag tag-stage">${r.stage}</span></td>
     <td>${r.hc}</td>
     <td>${fmt(r.teamGCI)}</td>
-    <td style="color:var(--tl-color);font-weight:700;">${fmt(r.tlNet)}</td>
-    <td style="color:var(--tm-color);font-weight:700;">${fmt(r.tmNet)}</td>
+    <td style="color:var(--tl-color);font-weight:700;">${tip(fmt(r.tlNet), tlTip2)}</td>
+    <td style="color:var(--tm-color);font-weight:700;">${tip(fmt(r.tmNet), tmTip2)}</td>
     <td style="color:var(--br-color);font-weight:700;">${fmt(r.brTot)}</td>
     <td>${fmt(r.rmxTot)}</td>
-    <td style="font-weight:700;">${fmt(r.office)}</td>
+    <td style="font-weight:700;">${tip(fmt(r.office), offTip2)}</td>
     <td>${i>0?`<button class="btn btn-del" style="padding:3px 8px;font-size:.7rem;" onclick="delScenario(${i-1})">✕</button>`:''}</td>
-  </tr>`).join('');
+  </tr>`}).join('');
 
   const t = all.reduce((a,r)=>({gci:a.gci+r.teamGCI,tl:a.tl+r.tlNet,tm:a.tm+r.tmNet,br:a.br+r.brTot,rmx:a.rmx+r.rmxTot,off:a.off+r.office}),{gci:0,tl:0,tm:0,br:0,rmx:0,off:0});
   document.getElementById('cmp-foot').innerHTML = `<tr style="font-weight:700;background:#e8f0fe;">
@@ -660,6 +835,77 @@ function renderCompare() {
     <td>${fmt(r.brTot)}</td>
     <td style="font-weight:700;color:var(--success);">€0 ✓</td>
   </tr>`).join('');
+
+  // ── DESK FEES TABLE ──
+  const indCount = parseInt(document.getElementById('indCount').value)||0;
+  const indFeeMonth = parseFloat(document.getElementById('indFeeMonth').value)||0;
+
+  const feeRows = [];
+
+  // Team rows
+  all.forEach(t => {
+    const tlFeeMonth = t.s.feeTL / 12;
+    const tmFeeMonth = t.s.feeTM / 12;
+    // TL row
+    feeRows.push({
+      cat: `${t.name} — Αρχηγός`,
+      count: 1,
+      feeMonth: tlFeeMonth,
+      monthly: tlFeeMonth,
+      annual: t.s.feeTL
+    });
+    // TM row
+    if(t.n > 0) {
+      feeRows.push({
+        cat: `${t.name} — Μέλη (×${t.n})`,
+        count: t.n,
+        feeMonth: tmFeeMonth,
+        monthly: t.n * tmFeeMonth,
+        annual: t.n * t.s.feeTM
+      });
+    }
+  });
+
+  // Individual agents row
+  if(indCount > 0) {
+    feeRows.push({
+      cat: `Individual Agents (×${indCount})`,
+      count: indCount,
+      feeMonth: indFeeMonth,
+      monthly: indCount * indFeeMonth,
+      annual: indCount * indFeeMonth * 12
+    });
+  }
+
+  const totalMonthly = feeRows.reduce((a,r) => a + r.monthly, 0);
+  const totalAnnual = feeRows.reduce((a,r) => a + r.annual, 0);
+  const totalHeads = feeRows.reduce((a,r) => a + r.count, 0);
+
+  document.getElementById('fees-body').innerHTML = feeRows.map(r => {
+    const moTip = `${r.count} × ${fmt(r.feeMonth)} = ${fmt(r.monthly)}`;
+    const anTip = `${fmt(r.monthly)} × 12 = ${fmt(r.annual)}`;
+    return `<tr>
+    <td class="left" style="font-weight:600;">${r.cat}</td>
+    <td>${r.count}</td>
+    <td>${fmt(r.feeMonth)}</td>
+    <td>${tip(fmt(r.monthly), moTip)}</td>
+    <td>${tip(fmt(r.annual), anTip)}</td>
+  </tr>`;
+  }).join('');
+
+  document.getElementById('fees-foot').innerHTML = `<tr style="font-weight:700;background:#e8f0fe;">
+    <td class="left">ΣΥΝΟΛΟ</td>
+    <td>${totalHeads}</td>
+    <td></td>
+    <td style="color:var(--primary);font-size:1rem;">${fmt(totalMonthly)}</td>
+    <td style="color:var(--primary);font-size:1rem;">${fmt(totalAnnual)}</td>
+  </tr>`;
+
+  document.getElementById('fees-metrics').innerHTML = `
+    <div class="metric m-ok"><div class="m-val">${fmt(totalMonthly)}</div><div class="m-label">Πάγιο / μήνα</div></div>
+    <div class="metric m-br"><div class="m-val">${fmt(totalAnnual)}</div><div class="m-label">Πάγιο / έτος</div></div>
+    <div class="metric" style="background:#f3e5f5;color:#7b1fa2;"><div class="m-val">${totalHeads}</div><div class="m-label">Σύνολο ατόμων</div></div>
+  `;
 }
 
 function showTab(id) {
@@ -668,11 +914,137 @@ function showTab(id) {
   document.getElementById(id).classList.add('active');
   event.target.classList.add('active');
   if(id==='compare') renderCompare();
+  if(id==='individual') calcInd();
+}
+
+// ── INDIVIDUAL CALCULATOR — 3-tier prospective ──
+function calcInd() {
+  const gci = v('iGCI',0);
+  const t1 = v('iT1',35000);
+  const t2 = v('iT2',55000);
+  const s1 = v('iS1',0.50);
+  const s2 = v('iS2',0.60);
+  const s3 = v('iS3',0.70);
+  const rmx = v('iRMX',0.09);
+  const deskMonth = v('iDesk',100);
+  const desk = deskMonth * 12;
+
+  const o1 = 1-s1-rmx, o2 = 1-s2-rmx, o3 = 1-s3-rmx;
+  document.getElementById('i-off1').textContent = pct(o1);
+  document.getElementById('i-off2').textContent = pct(o2);
+  document.getElementById('i-off3').textContent = pct(o3);
+  document.getElementById('i-t3label').textContent = fmt(t2) + '+';
+
+  // Prospective: each zone's GCI taxed at its own split
+  function calcOne(g) {
+    const z1 = Math.min(g, t1);
+    const z2 = Math.max(0, Math.min(g, t2) - t1);
+    const z3 = Math.max(0, g - t2);
+
+    const agZ1 = z1*s1, agZ2 = z2*s2, agZ3 = z3*s3;
+    const ofZ1 = z1*o1, ofZ2 = z2*o2, ofZ3 = z3*o3;
+    const rxZ1 = z1*rmx, rxZ2 = z2*rmx, rxZ3 = z3*rmx;
+
+    const agentGross = agZ1+agZ2+agZ3;
+    const officeGross = ofZ1+ofZ2+ofZ3;
+    const rmxGross = rxZ1+rxZ2+rxZ3;
+    const agentNet = agentGross - desk;
+    const effSplit = g>0 ? agentNet/g : 0;
+    const monthly = agentNet/12;
+    const officeTotal = officeGross + desk;
+
+    // Current tier
+    let tier = 1, curSplit = s1, nextIn = t1-g;
+    if(g >= t2) { tier=3; curSplit=s3; nextIn=0; }
+    else if(g >= t1) { tier=2; curSplit=s2; nextIn=t2-g; }
+
+    return { g, z1, z2, z3, s1, s2, s3, o1, o2, o3, rmx,
+      agZ1, agZ2, agZ3, ofZ1, ofZ2, ofZ3, rxZ1, rxZ2, rxZ3,
+      agentGross, officeGross, rmxGross, agentNet, effSplit, monthly, officeTotal, desk,
+      tier, curSplit, nextIn };
+  }
+
+  const r = calcOne(gci);
+
+  document.getElementById('i-sub').textContent = document.getElementById('iName').value;
+
+  // Tier info
+  const tierLabels = {1:'① 50/50', 2:'② 60/40', 3:'③ 70/30'};
+  const tierColors = {1:'var(--muted)', 2:'var(--tl-color)', 3:'var(--success)'};
+  document.getElementById('i-tier').innerHTML = `<span style="color:${tierColors[r.tier]};font-weight:800;">${tierLabels[r.tier]}</span>`;
+  document.getElementById('i-curSplit').innerHTML = `<span style="color:${tierColors[r.tier]};">${(r.curSplit*100).toFixed(0)}/${((1-r.curSplit-rmx)*100).toFixed(0)}</span>`;
+  document.getElementById('i-nextIn').innerHTML = r.nextIn > 0
+    ? `${fmt(r.nextIn)} GCI ακόμα`
+    : '<span style="color:var(--success);">MAX ★</span>';
+
+  // Zone breakdown with tooltips
+  const zones = [
+    {label:'Σκαλί 1: €0 – '+fmt(t1), split:'50/50', gci:r.z1, ag:r.agZ1, of:r.ofZ1, rx:r.rxZ1, sp:s1, op:o1, color:'var(--muted)', active:r.z1>0},
+    {label:'Σκαλί 2: '+fmt(t1)+' – '+fmt(t2), split:'60/40', gci:r.z2, ag:r.agZ2, of:r.ofZ2, rx:r.rxZ2, sp:s2, op:o2, color:'var(--tl-color)', active:r.z2>0},
+    {label:'Σκαλί 3: '+fmt(t2)+'+', split:'70/30', gci:r.z3, ag:r.agZ3, of:r.ofZ3, rx:r.rxZ3, sp:s3, op:o3, color:'var(--success)', active:r.z3>0},
+  ];
+  document.getElementById('i-zones').innerHTML = zones.map(z => {
+    const agTip = `${fmt(z.gci)} × ${pct(z.sp)} = ${fmt(z.ag)}`;
+    const ofTip = `${fmt(z.gci)} × ${pct(z.op)} = ${fmt(z.of)}`;
+    return `
+    <div style="opacity:${z.active?1:0.4};margin-bottom:8px;">
+      <div style="font-size:.82rem;font-weight:700;color:${z.color};margin-bottom:4px;">${z.label} <span style="background:${z.active?z.color:'#ccc'};color:#fff;padding:1px 8px;border-radius:10px;font-size:.72rem;">${z.split}</span></div>
+      <div class="output-row thirds">
+        <div class="out-cell"><span class="out-label">GCI ζώνης</span><span class="out-val">${fmt(z.gci)}</span></div>
+        <div class="out-cell" style="background:var(--tl-bg);"><span class="out-label">Agent</span><span class="out-val" style="color:var(--tl-color);">${z.active?tip(fmt(z.ag),agTip):fmt(z.ag)}</span></div>
+        <div class="out-cell" style="background:var(--br-bg);"><span class="out-label">Office</span><span class="out-val" style="color:var(--br-color);">${z.active?tip(fmt(z.of),ofTip):fmt(z.of)}</span></div>
+      </div>
+    </div>
+  `}).join('');
+
+  // Totals with tooltips
+  const agParts = zones.filter(z=>z.active).map(z=>`${fmt(z.gci)} × ${pct(z.sp)}`).join(' + ');
+  const agGrossTip = `${agParts}\n= ${fmt(r.agentGross)}`;
+  const ofParts = zones.filter(z=>z.active).map(z=>`${fmt(z.gci)} × ${pct(z.op)}`).join(' + ');
+  const ofGrossTip = `${ofParts}\n= ${fmt(r.officeGross)}`;
+  const agNetTip = `Agent Gross: ${fmt(r.agentGross)}\n- Desk Fee: ${fmt(deskMonth)}/μήνα × 12 = ${fmt(r.desk)}\n= ${fmt(r.agentNet)}`;
+  document.getElementById('i-mAgent').innerHTML = `<div class="m-val">${tip(fmt(r.agentGross), agGrossTip)}</div><div class="m-label">Agent Gross</div>`;
+  document.getElementById('i-mOffice').innerHTML = `<div class="m-val">${tip(fmt(r.officeGross), ofGrossTip)}</div><div class="m-label">Office Gross</div>`;
+  document.getElementById('i-mRMX').innerHTML = `<div class="m-val">${fmt(r.rmxGross)}</div><div class="m-label">RE/MAX</div>`;
+  document.getElementById('i-mNet').innerHTML = `<div class="m-val">${tip(fmt(r.agentNet), agNetTip)}</div><div class="m-label">Agent Net (μετά fee)</div>`;
+
+  document.getElementById('i-desk').innerHTML = tip(`-${fmt(r.desk)}`, `${fmt(deskMonth)}/μήνα × 12 = ${fmt(r.desk)}/έτος`);
+  document.getElementById('i-eff').innerHTML = tip(pct(r.effSplit), `${fmt(r.agentNet)} ÷ ${fmt(gci)} = ${pct(r.effSplit)}`);
+  document.getElementById('i-monthly').innerHTML = tip(fmt(r.monthly), `${fmt(r.agentNet)} ÷ 12 = ${fmt(r.monthly)}`);
+  document.getElementById('i-offTotal').innerHTML = tip(fmt(r.officeTotal), `Office Gross: ${fmt(r.officeGross)}\n+ Desk Fee: ${fmt(r.desk)}\n= ${fmt(r.officeTotal)}`);
+
+  // Quick compare table with tooltips
+  const steps = [15000, 25000, 35000, 40000, 45000, 55000, 60000, 70000, 80000, 100000, 120000];
+  document.getElementById('i-cmpBody').innerHTML = steps.map(g => {
+    const c = calcOne(g);
+    const isCurrent = g === gci;
+    const style = isCurrent ? ' style="background:#e8f5e9;font-weight:700;"' : '';
+    // Build breakdown tip per row
+    const parts = [];
+    if(c.z1>0) parts.push(`${fmt(c.z1)} × ${pct(s1)}`);
+    if(c.z2>0) parts.push(`${fmt(c.z2)} × ${pct(s2)}`);
+    if(c.z3>0) parts.push(`${fmt(c.z3)} × ${pct(s3)}`);
+    const agTip2 = parts.join(' + ') + `\n= ${fmt(c.agentGross)}`;
+    const netTip2 = `${fmt(c.agentGross)} - ${fmt(c.desk)} = ${fmt(c.agentNet)}`;
+    const moTip2 = `${fmt(c.agentNet)} ÷ 12 = ${fmt(c.monthly)}`;
+    return `<tr${style}>
+      <td>${fmt(g)}${isCurrent?' ★':''}</td>
+      <td><span style="color:${tierColors[c.tier]};font-weight:700;">${tierLabels[c.tier]}</span></td>
+      <td style="color:var(--tl-color);font-weight:700;">${tip(fmt(c.agentGross), agTip2)}</td>
+      <td style="color:var(--danger);">${tip('-'+fmt(c.desk), fmt(deskMonth)+'/μήνα × 12')}</td>
+      <td style="color:var(--tl-color);font-weight:800;">${tip(fmt(c.agentNet), netTip2)}</td>
+      <td style="color:var(--tl-color);font-weight:700;">${tip(fmt(c.monthly), moTip2)}</td>
+      <td style="color:var(--br-color);">${fmt(c.officeTotal)}</td>
+      <td>${fmt(c.rmxGross)}</td>
+      <td>${pct(c.effSplit)}</td>
+    </tr>`;
+  }).join('');
 }
 
 // Init
 renderMembers();
 recalc();
+calcInd();
 
 // Pre-load comparison scenarios
 [
