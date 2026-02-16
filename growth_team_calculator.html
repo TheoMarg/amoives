@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compensation Calculator — RE/MAX Delta Ktima</title>
+<style>
+:root{
+  --notion-text:#37352f;--notion-text-gray:#787774;--notion-text-light:#9b9a97;--notion-text-faint:#c3c2bf;
+  --notion-bg:#ffffff;--notion-canvas:#f7f6f3;--notion-hover:rgba(55,53,47,0.04);
+  --notion-border:rgba(55,53,47,0.09);--notion-border2:rgba(55,53,47,0.16);
+  --notion-red:#e03e3e;--notion-red-bg:rgba(224,62,62,0.08);
+  --notion-green:#0f7b6c;--notion-green-bg:rgba(15,123,108,0.08);
+  --notion-blue:#0b6e99;--notion-blue-bg:rgba(11,110,153,0.08);
+  --notion-orange:#d9730d;--notion-orange-bg:rgba(217,115,13,0.08);
+  --notion-yellow:#dfab01;--notion-yellow-bg:rgba(223,171,1,0.08);
+  --notion-purple:#6940a5;--notion-purple-bg:rgba(105,64,165,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";background:var(--notion-canvas);color:var(--notion-text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.page{max-width:900px;margin:0 auto;background:var(--notion-bg);min-height:100vh;padding:0 96px 120px}
+@media(max-width:860px){.page{padding:0 24px 80px}}
+
+.breadcrumb{padding:12px 0;font-size:12px;color:var(--notion-text-light);display:flex;align-items:center;gap:4px}
+.breadcrumb span{opacity:.6}.breadcrumb a{color:var(--notion-text-gray);text-decoration:none}.breadcrumb a:hover{color:var(--notion-text)}
+.cover{height:6px;background:linear-gradient(90deg,var(--notion-red),var(--notion-orange),var(--notion-blue));margin:0 -96px}
+@media(max-width:860px){.cover{margin:0 -24px}}
+
+.page-header{padding:48px 0 4px}
+.page-icon{font-size:48px;margin-bottom:12px;line-height:1}
+.page-title{font-size:40px;font-weight:700;color:var(--notion-text);line-height:1.2;letter-spacing:-.02em;margin-bottom:4px}
+.page-desc{font-size:15px;color:var(--notion-text-gray);line-height:1.6;max-width:600px;margin-bottom:24px}
+
+.props{border-top:1px solid var(--notion-border);padding:10px 0;margin-bottom:32px}
+.prop-row{display:flex;align-items:center;padding:4px 0;font-size:13px}
+.prop-row .prop-label{width:140px;flex-shrink:0;color:var(--notion-text-gray);font-size:13px;display:flex;align-items:center;gap:6px}
+.prop-row .prop-label svg{width:14px;height:14px;opacity:.5}
+.prop-row .prop-value{color:var(--notion-text)}
+.tag{display:inline-flex;padding:2px 8px;border-radius:3px;font-size:12px;font-weight:500}
+.tag-green{background:var(--notion-green-bg);color:var(--notion-green)}
+.tag-blue{background:var(--notion-blue-bg);color:var(--notion-blue)}
+.tag-red{background:var(--notion-red-bg);color:var(--notion-red)}
+.tag-orange{background:var(--notion-orange-bg);color:var(--notion-orange)}
+.tag-purple{background:var(--notion-purple-bg);color:var(--notion-purple)}
+.tag-yellow{background:var(--notion-yellow-bg);color:var(--notion-yellow)}
+
+.h3{font-size:20px;font-weight:600;color:var(--notion-text);margin:28px 0 4px;letter-spacing:-.01em}
+.text-block{font-size:14px;color:var(--notion-text-gray);margin-bottom:16px;line-height:1.6}
+.divider{height:1px;background:var(--notion-border);margin:32px 0}
+
+.callout{display:flex;gap:12px;padding:16px;border-radius:4px;margin:16px 0;font-size:14px;line-height:1.6}
+.callout-icon{font-size:20px;flex-shrink:0;line-height:1.4}
+.callout-green{background:var(--notion-green-bg)}.callout-red{background:var(--notion-red-bg)}
+.callout-yellow{background:var(--notion-yellow-bg)}.callout-blue{background:var(--notion-blue-bg)}
+.callout-body{flex:1}.callout-body strong{font-weight:600}
+
+/* Inputs */
+.input-row{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px}
+.input-field{flex:1;min-width:200px}
+.input-field label{display:block;font-size:12px;color:var(--notion-text-gray);margin-bottom:4px}
+.input-field input{width:100%;padding:8px 10px;border:1px solid var(--notion-border2);border-radius:4px;font-size:16px;font-weight:600;font-family:inherit;color:var(--notion-text);background:var(--notion-bg);outline:none;transition:all .15s}
+.input-field input:focus{border-color:var(--notion-blue);box-shadow:0 0 0 2px var(--notion-blue-bg)}
+.input-hint{font-size:11px;color:var(--notion-text-faint);margin-top:2px}
+.active-count{display:flex;align-items:baseline;gap:6px;padding:8px 0;font-size:13px;color:var(--notion-text-gray)}
+.active-count b{font-size:22px;font-weight:700;color:var(--notion-text)}
+
+/* TM dynamic */
+.tm-header{display:flex;justify-content:space-between;align-items:center;margin:20px 0 8px}
+.tm-header label{font-size:12px;color:var(--notion-text-gray)}
+.tm-actions{display:flex;gap:6px}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:4px;border:1px solid var(--notion-border);font-size:12px;font-weight:500;font-family:inherit;color:var(--notion-text-gray);background:var(--notion-bg);cursor:pointer;transition:all .1s}
+.btn:hover{background:var(--notion-hover);border-color:var(--notion-border2)}
+.btn-blue{background:var(--notion-blue-bg);color:var(--notion-blue);border-color:rgba(11,110,153,0.2)}
+.btn-blue:hover{background:rgba(11,110,153,0.15)}
+.btn-red{color:var(--notion-red);border-color:rgba(224,62,62,0.15)}
+.btn-red:hover{background:var(--notion-red-bg)}
+.btn:disabled{opacity:.3;cursor:default;pointer-events:none}
+.btn svg{width:14px;height:14px}
+
+.tm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 16px}
+@media(max-width:700px){.tm-grid{grid-template-columns:repeat(2,1fr)}}
+.tm-cell{padding:8px 10px;border:1px solid var(--notion-border);border-radius:4px;background:var(--notion-bg);transition:all .15s;position:relative}
+.tm-cell.has-val{background:var(--notion-green-bg);border-color:rgba(15,123,108,0.2)}
+.tm-cell:focus-within{border-color:var(--notion-blue);box-shadow:0 0 0 2px var(--notion-blue-bg)}
+.tm-cell label{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--notion-text-gray);margin-bottom:2px}
+.tm-cell label .dot{width:6px;height:6px;border-radius:50%;background:var(--notion-green)}
+.tm-cell input{width:100%;border:none;background:transparent;font-size:14px;font-weight:600;font-family:inherit;color:var(--notion-text);outline:none}
+.tm-cell input::placeholder{color:var(--notion-text-faint);font-weight:400}
+.tm-cell .remove-tm{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:3px;border:none;background:transparent;color:var(--notion-text-faint);cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;opacity:0;transition:all .1s}
+.tm-cell:hover .remove-tm{opacity:1}
+.tm-cell .remove-tm:hover{background:var(--notion-red-bg);color:var(--notion-red)}
+.tm-empty{padding:16px;text-align:center;border:1px dashed var(--notion-border);border-radius:4px;color:var(--notion-text-faint);font-size:13px;margin-bottom:16px}
+
+.stats-bar{display:flex;gap:24px;padding:12px 0;border-top:1px solid var(--notion-border);border-bottom:1px solid var(--notion-border);margin:12px 0 0;flex-wrap:wrap}
+.stat-item .stat-l{font-size:11px;color:var(--notion-text-light)}.stat-item .stat-v{font-size:15px;font-weight:700;color:var(--notion-text)}
+
+/* Tabs */
+.toggle-tabs{display:flex;gap:0;border-bottom:1px solid var(--notion-border);margin-bottom:4px;flex-wrap:wrap}
+.ttab{padding:8px 12px;font-size:14px;color:var(--notion-text-light);background:none;border:none;cursor:pointer;position:relative;transition:color .1s}
+.ttab:hover{color:var(--notion-text);background:var(--notion-hover)}
+.ttab.on{color:var(--notion-text);font-weight:500}
+.ttab.on::after{content:'';position:absolute;bottom:-1px;left:8px;right:8px;height:2px;background:var(--notion-text);border-radius:1px}
+.tc{display:none}.tc.on{display:block}
+
+/* Gallery */
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+@media(max-width:640px){.gallery{grid-template-columns:1fr}.gallery[style*="repeat(4"]{grid-template-columns:repeat(2,1fr)!important}}
+.gcard{border:1px solid var(--notion-border);border-radius:4px;padding:20px 16px;background:var(--notion-bg);transition:background .1s}
+.gcard:hover{background:var(--notion-hover)}
+.gcard .gc-tag{margin-bottom:12px}
+.gcard .gc-row{display:flex;justify-content:space-between;margin-bottom:8px}
+.gcard .gc-col{text-align:center;flex:1}
+.gcard .gc-sub{font-size:11px;color:var(--notion-text-light);margin-bottom:2px}
+.gcard .gc-val{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+.gcard .gc-val.old{color:var(--notion-red)}.gcard .gc-val.new{color:var(--notion-green)}
+.gcard .gc-diff{text-align:center;padding-top:10px;margin-top:4px;border-top:1px solid var(--notion-border);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums}
+.gcard .gc-diff.pos{color:var(--notion-green)}.gcard .gc-diff.neg{color:var(--notion-red)}
+
+/* Tables */
+.ntable{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0}
+.ntable th{text-align:left;font-size:12px;font-weight:500;color:var(--notion-text-gray);padding:6px 8px;border-bottom:1px solid var(--notion-border2);white-space:nowrap}
+.ntable th.r{text-align:right}.ntable th.c-red{color:var(--notion-red)}.ntable th.c-grn{color:var(--notion-green)}
+.ntable td{padding:6px 8px;border-bottom:1px solid var(--notion-border)}
+.ntable td.r{text-align:right;font-weight:500;font-variant-numeric:tabular-nums}
+.ntable td.l{color:var(--notion-text-gray)}
+.ntable tr:hover{background:var(--notion-hover)}
+.ntable tr.tot td{border-top:2px solid var(--notion-text);border-bottom:none;font-weight:700}
+.ntable tr.sec td{font-size:12px;font-weight:600;color:var(--notion-text-gray);padding-top:14px;background:var(--notion-canvas);border-bottom:1px solid var(--notion-border)}
+.ntable tr.onetime td{color:var(--notion-text-light);font-style:italic}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0}
+@media(max-width:700px){.two-col{grid-template-columns:1fr}}
+.panel{border:1px solid var(--notion-border);border-radius:4px;overflow:hidden;background:var(--notion-bg)}
+.panel .p-head{padding:10px 14px;font-size:13px;font-weight:600;border-bottom:1px solid var(--notion-border)}
+.panel.old .p-head{background:var(--notion-red-bg);color:var(--notion-red)}
+.panel.new .p-head{background:var(--notion-green-bg);color:var(--notion-green)}
+.panel .ntable td,.panel .ntable th{padding:5px 12px}
+.panel .ntable tr:last-child td{border-bottom:none}
+
+/* Per 100 */
+.p100-card{border:1px solid var(--notion-border);border-radius:4px;overflow:hidden;background:var(--notion-bg)}
+.p100-card .p100-h{padding:10px 14px;font-size:13px;font-weight:600;color:var(--notion-text);background:var(--notion-canvas);border-bottom:1px solid var(--notion-border)}
+.p100-table{width:100%;border-collapse:collapse}
+.p100-table th{font-size:10px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;color:var(--notion-text-light);padding:6px 14px;text-align:right;background:var(--notion-canvas);border-bottom:1px solid var(--notion-border)}
+.p100-table th:first-child{text-align:left}
+.p100-table th.h-o{color:var(--notion-red)}.p100-table th.h-n{color:var(--notion-green)}.p100-table th.h-d{color:var(--notion-orange)}
+.p100-table td{padding:8px 14px;border-bottom:1px solid var(--notion-border);font-size:13px}
+.p100-table tr:last-child td{border-bottom:none}
+.p100-table tr:hover{background:var(--notion-hover)}
+.p100-table td:first-child{color:var(--notion-text-gray)}
+.p100-table td.r{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.p100-table td.o{color:var(--notion-red)}.p100-table td.n{color:var(--notion-green)}.p100-table td.d{color:var(--notion-orange);font-size:12px}
+
+/* Monthly */
+.m-card{border:1px solid var(--notion-border);border-radius:4px;overflow:hidden;background:var(--notion-bg);margin-bottom:16px}
+.m-card .m-head{padding:12px 16px;font-size:13px;font-weight:600;border-bottom:1px solid var(--notion-border);display:flex;align-items:center;justify-content:space-between}
+.m-cols{display:flex;padding:6px 16px;background:var(--notion-canvas);border-bottom:1px solid var(--notion-border)}
+.m-cols span{font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--notion-text-light);min-width:80px;text-align:right}
+.m-cols span.d-col{min-width:70px}.m-cols span:first-child{flex:1;text-align:left}
+.m-cols .h-o{color:var(--notion-red)}.m-cols .h-n{color:var(--notion-green)}.m-cols .h-d{color:var(--notion-orange)}
+.m-row{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid var(--notion-border);transition:background .1s}
+.m-row:last-child{border:none}.m-row:hover{background:var(--notion-hover)}
+.m-row .m-label{flex:1;font-size:13px;color:var(--notion-text-gray);display:flex;align-items:center;gap:8px}
+.m-row .m-label .m-icon{font-size:16px}
+.m-row .m-vals{display:flex;gap:20px;align-items:baseline}
+.m-row .m-val{min-width:80px;text-align:right;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
+.m-val.old{color:var(--notion-red)}.m-val.new{color:var(--notion-green)}
+.m-val.diff{font-size:12px;min-width:70px;padding:2px 8px;border-radius:3px}
+.m-val.diff.pos{color:var(--notion-green);background:var(--notion-green-bg)}
+.m-val.diff.neg{color:var(--notion-red);background:var(--notion-red-bg)}
+.m-row.m-total{background:var(--notion-canvas);border-top:2px solid var(--notion-border2)}
+.m-row.m-total .m-label{font-weight:700;color:var(--notion-text)}
+.m-row.m-total .m-val{font-weight:700;font-size:16px}
+
+@media print{body{background:#fff}.page{padding:0 40px 40px}.cover{display:none}.toggle-tabs{display:none}.section-sw{display:none}.tc{display:block!important;margin-bottom:20px}.sec{display:block!important}}
+
+
+/* Tooltips */
+.tip{position:relative;cursor:help;border-bottom:1px dotted var(--notion-text-faint)}
+.tip::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--notion-text);color:#fff;padding:8px 12px;border-radius:6px;font-size:12px;font-weight:400;white-space:pre-line;z-index:100;pointer-events:none;opacity:0;transition:opacity .15s;min-width:180px;max-width:320px;line-height:1.5;box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.tip::before{content:'';position:absolute;bottom:calc(100% + 2px);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--notion-text);z-index:101;pointer-events:none;opacity:0;transition:opacity .15s}
+.tip:hover::after,.tip:hover::before,.tip.show::after,.tip.show::before{opacity:1}
+@media(max-width:768px){.tip::after{left:0;transform:none;min-width:200px}}
+
+/* TL Tiers */
+.tl-tier-toggle{display:flex;align-items:center;gap:12px;margin:16px 0 8px;padding:10px 12px;background:var(--notion-canvas);border:1px solid var(--notion-border);border-radius:6px}
+.tl-tier-toggle label{font-size:13px;color:var(--notion-text-gray);flex:1}
+.tl-switch{position:relative;width:36px;height:20px;cursor:pointer}
+.tl-switch input{display:none}
+.tl-switch .slider{position:absolute;inset:0;background:var(--notion-border2);border-radius:10px;transition:.2s}
+.tl-switch .slider::before{content:'';position:absolute;width:16px;height:16px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.2s}
+.tl-switch input:checked+.slider{background:var(--notion-blue)}
+.tl-switch input:checked+.slider::before{transform:translateX(16px)}
+.tl-tiers-area{margin:8px 0 16px;padding:12px;background:var(--notion-canvas);border:1px solid var(--notion-border);border-radius:6px;display:none}
+.tl-tiers-area.on{display:block}
+.tl-tier-base{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--notion-bg);border:1px solid var(--notion-border);border-radius:4px;margin-bottom:8px;font-size:13px;color:var(--notion-text-gray)}
+.tl-tier-base .tag{font-size:11px}
+.tl-tier-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:8px}
+.tl-tier-card{padding:10px;border:1px solid var(--notion-border);border-radius:6px;background:var(--notion-bg);position:relative}
+.tl-tier-card label{display:block;font-size:11px;color:var(--notion-text-gray);margin-bottom:3px}
+.tl-tier-card input{width:100%;padding:5px 8px;border:1px solid var(--notion-border);border-radius:4px;font-family:inherit;font-size:13px;background:var(--notion-bg)}
+.tl-tier-card .remove-tier{position:absolute;top:4px;right:4px;width:20px;height:20px;border:none;background:none;color:var(--notion-text-faint);cursor:pointer;font-size:14px;border-radius:4px;display:flex;align-items:center;justify-content:center}
+.tl-tier-card .remove-tier:hover{background:var(--notion-hover);color:var(--notion-red)}
+.tl-tier-card .tier-num{font-size:12px;font-weight:600;color:var(--notion-orange);margin-bottom:6px}
+
+/* Section switcher */
+.section-sw{display:flex;gap:8px;margin-bottom:28px}
+.section-btn{flex:1;padding:14px 16px;border:1px solid var(--notion-border2);border-radius:6px;background:var(--notion-bg);font-family:inherit;font-size:14px;font-weight:500;color:var(--notion-text-gray);cursor:pointer;transition:all .15s;text-align:left;display:flex;align-items:center;gap:10px}
+.section-btn:hover{background:var(--notion-hover);border-color:var(--notion-text-faint)}
+.section-btn.on{border-color:var(--notion-blue);background:var(--notion-blue-bg);color:var(--notion-blue);font-weight:600}
+.section-btn .sb-icon{font-size:20px}
+.section-btn .sb-sub{font-size:11px;color:var(--notion-text-light);font-weight:400;display:block}
+.section-btn.on .sb-sub{color:var(--notion-blue)}
+.sec{display:none}.sec.on{display:block}
+
+/* Individual Agent tab */
+.ind-tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:12px 0}
+@media(max-width:700px){.ind-tiers{grid-template-columns:1fr}}
+.ind-tier{border:1px solid var(--notion-border);border-radius:4px;overflow:hidden;background:var(--notion-bg)}
+.ind-tier-head{padding:8px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--notion-border)}
+.ind-tier-split{font-size:12px;font-weight:600;color:var(--notion-text-gray)}
+.ind-tier-body{padding:10px 12px}
+.ind-tier-body label{display:block;font-size:11px;color:var(--notion-text-gray);margin:6px 0 2px}
+.ind-tier-body label:first-child{margin-top:0}
+.ind-tier-body input{width:100%;padding:6px 8px;border:1px solid var(--notion-border2);border-radius:4px;font-size:14px;font-weight:600;font-family:inherit;color:var(--notion-text);background:var(--notion-bg);outline:none}
+.ind-tier-body input:focus{border-color:var(--notion-blue);box-shadow:0 0 0 2px var(--notion-blue-bg)}
+.ind-t3-label{padding:6px 8px;background:var(--notion-canvas);border-radius:4px;font-size:14px;font-weight:600;color:var(--notion-text);text-align:center}
+.ind-off-pct{font-size:12px;color:var(--notion-text-gray);margin-top:8px;text-align:center;padding:4px;background:var(--notion-canvas);border-radius:3px}
+.ind-off-pct strong{color:var(--notion-text)}
+.ind-status-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--notion-border);border:1px solid var(--notion-border);border-radius:4px;overflow:hidden;margin-bottom:16px}
+.ind-status-item{background:var(--notion-bg);padding:10px 14px;text-align:center}
+.ind-s-label{font-size:11px;color:var(--notion-text-gray);margin-bottom:2px}
+.ind-s-val{font-size:15px;font-weight:700}
+.ind-zone{margin-bottom:10px;border:1px solid var(--notion-border);border-radius:4px;overflow:hidden;transition:opacity .2s}
+.ind-zone.inactive{opacity:.35}
+.ind-zone-head{padding:6px 12px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--notion-border)}
+.ind-zone-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--notion-border)}
+.ind-zone-cell{background:var(--notion-bg);padding:8px 12px;text-align:center}
+.ind-zone-cell .zl{font-size:11px;color:var(--notion-text-light);margin-bottom:1px}
+.ind-zone-cell .zv{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+.ind-bottom-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--notion-border);border:1px solid var(--notion-border);border-radius:4px;overflow:hidden;margin:16px 0}
+.ind-bot-item{background:var(--notion-bg);padding:10px 14px;display:flex;justify-content:space-between;align-items:center}
+.ind-bot-hl{background:var(--notion-green-bg)}
+.ind-bot-label{font-size:12px;color:var(--notion-text-gray)}
+.ind-bot-val{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+/* Password overlay */
+#pw-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#1a1a2e,#16213e);display:flex;align-items:center;justify-content:center;z-index:9999}
+#pw-overlay.hidden{display:none}
+.pw-box{background:#fff;border-radius:16px;padding:40px 36px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.3);max-width:380px;width:90%}
+.pw-box h2{color:#16213e;margin-bottom:6px;font-size:1.2rem}
+.pw-box p{color:var(--notion-text-gray);font-size:0.85rem;margin-bottom:20px}
+.pw-box input{width:100%;padding:12px 16px;border:2px solid var(--notion-border2);border-radius:8px;font-family:inherit;font-size:1rem;text-align:center;letter-spacing:2px}
+.pw-box input:focus{outline:none;border-color:var(--notion-blue);box-shadow:0 0 0 3px var(--notion-blue-bg)}
+.pw-box button{margin-top:14px;width:100%;padding:12px;border:none;border-radius:8px;background:var(--notion-blue);color:#fff;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;transition:background 0.2s}
+.pw-box button:hover{background:#094d6e}
+.pw-error{color:var(--notion-red);font-size:0.82rem;margin-top:10px;display:none}
+#app-content{display:none}
+#app-content.visible{display:block}
+</style>
+</head>
+<body>
+
+<div id="pw-overlay">
+  <div class="pw-box">
+    <h2>&#128274; Password Required</h2>
+    <p>RE/MAX Delta Ktima — Compensation Calculator</p>
+    <input type="password" id="pw-input" placeholder="Εισάγετε κωδικό..." autofocus
+      onkeydown="if(event.key==='Enter')checkPw()">
+    <button onclick="checkPw()">Είσοδος</button>
+    <div class="pw-error" id="pw-error">Λάθος κωδικός. Δοκιμάστε ξανά.</div>
+  </div>
+</div>
+
+<div id="app-content">
+<div class="page">
+  <div class="cover"></div>
+  <div class="breadcrumb"><a>RE/MAX Delta Ktima</a><span>/</span><a>Operations</a><span>/</span><span style="color:var(--notion-text)">Compensation Calculator</span></div>
+
+  <div class="page-header">
+    <div class="page-title">Compensation Calculator</div>
+    <div class="page-desc">Εργαλείο σύγκρισης μοντέλων αμοιβών: Growth Team Model (ομάδες) και Individual Agent (3 σκαλιά split).</div>
+  </div>
+
+  <div class="props">
+    <div class="prop-row"><div class="prop-label"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 2a6 6 0 100 12A6 6 0 008 2zm0 1a5 5 0 110 10A5 5 0 018 3zm-.5 2v3.5l2.5 1.5.5-.87-2-1.2V5h-1z"/></svg>Status</div><div class="prop-value"><span class="tag tag-green">Active</span></div></div>
+    <div class="prop-row"><div class="prop-label"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3 2.5A1.5 1.5 0 014.5 1h7A1.5 1.5 0 0113 2.5v11a1.5 1.5 0 01-1.5 1.5h-7A1.5 1.5 0 013 13.5v-11zM4.5 2a.5.5 0 00-.5.5v11a.5.5 0 00.5.5h7a.5.5 0 00.5-.5v-11a.5.5 0 00-.5-.5h-7z"/></svg>Offices</div><div class="prop-value">Λάρισα, Κατερίνη</div></div>
+    <div class="prop-row"><div class="prop-label"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4.5 3A1.5 1.5 0 003 4.5v7A1.5 1.5 0 004.5 13h7a1.5 1.5 0 001.5-1.5v-7A1.5 1.5 0 0011.5 3h-7zM4 4.5a.5.5 0 01.5-.5h7a.5.5 0 01.5.5v7a.5.5 0 01-.5.5h-7a.5.5 0 01-.5-.5v-7z"/></svg>Type</div><div class="prop-value"><span class="tag tag-blue">Financial Model</span></div></div>
+  </div>
+
+  <!-- SECTION SWITCHER -->
+  <div class="section-sw">
+    <button class="section-btn on" onclick="swSec('team',this)">
+      <span class="sb-icon">👥</span>
+      <span><span class="sb-title">Growth Team Model</span><span class="sb-sub">Σύγκριση μοντέλων ομάδας</span></span>
+    </button>
+    <button class="section-btn" onclick="swSec('ind',this)">
+      <span class="sb-icon">👤</span>
+      <span><span class="sb-title">Individual Agent</span><span class="sb-sub">3 Σκαλιά — Prospective Split</span></span>
+    </button>
+  </div>
+
+  <!-- SECTION: GROWTH TEAM -->
+  <div class="sec on" id="sec-team">
+
+  <!-- INPUTS -->
+  <div class="h3">⚙️ Παράμετροι</div>
+  <div style="margin:16px 0">
+    <div class="input-row">
+      <div class="input-field">
+        <label>Ετήσια Παραγωγή TL (GCI)</label>
+        <input type="text" id="tl" value="80.000" oninput="go()">
+        <div class="input-hint">€ ανά έτος</div>
+      </div>
+      <div class="active-count">Μέλη: <b id="nTM">3</b></div>
+    </div>
+
+    <!-- TL Performance Tiers -->
+    <div class="tl-tier-toggle">
+      <label>📈 Κλίμακες απόδοσης TL (σκαλιά στα ίδια deals)</label>
+      <label class="tl-switch"><input type="checkbox" id="tlTierToggle" onchange="toggleTlTiers()"><span class="slider"></span></label>
+    </div>
+    <div class="tl-tiers-area" id="tlTiersArea">
+      <div class="tl-tier-base">
+        <span class="tag tag-blue">Βάση</span> 0 € — Split: <strong>50,00 / 50,00</strong> (post-RE/MAX 9,00%)
+      </div>
+      <div class="tm-actions" style="margin-bottom:8px">
+        <button class="btn btn-blue" onclick="addTlTier()" id="btnAddTier"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 3a.5.5 0 01.5.5v4h4a.5.5 0 010 1h-4v4a.5.5 0 01-1 0v-4h-4a.5.5 0 010-1h4v-4A.5.5 0 018 3z"/></svg>Προσθήκη Σκαλιού</button>
+        <button class="btn btn-red" onclick="removeLastTlTier()" id="btnRemTier" disabled><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 7.5a.5.5 0 000 1h9a.5.5 0 000-1h-9z"/></svg>Αφαίρεση</button>
+      </div>
+      <div class="tl-tier-grid" id="tlTierGrid"></div>
+      <div class="text-block" style="font-size:12px;margin-top:8px;color:var(--notion-text-faint)">Κάθε σκαλί ορίζει ένα κατώφλι GCI και το split που ισχύει πάνω από αυτό. Λογική: GCI − 9% RE/MAX, μετά split.</div>
+    </div>
+
+    <div class="tm-header">
+      <label>Παραγωγή ανά Team Member (€ / έτος)</label>
+      <div class="tm-actions">
+        <button class="btn btn-blue" onclick="addTM()" id="btnAdd"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 3a.5.5 0 01.5.5v4h4a.5.5 0 010 1h-4v4a.5.5 0 01-1 0v-4h-4a.5.5 0 010-1h4v-4A.5.5 0 018 3z"/></svg>Προσθήκη TM</button>
+        <button class="btn btn-red" onclick="removeLastTM()" id="btnRem" disabled><svg viewBox="0 0 16 16" fill="currentColor"><path d="M3.5 7.5a.5.5 0 000 1h9a.5.5 0 000-1h-9z"/></svg>Αφαίρεση</button>
+      </div>
+    </div>
+    <div class="tm-grid" id="tg"></div>
+    <div class="stats-bar" id="stats"></div>
+  </div>
+  <div class="divider"></div>
+
+  <div class="toggle-tabs">
+    <button class="ttab on" onclick="sw('ov',this)">Σύνοψη</button>
+    <button class="ttab" onclick="sw('mo',this)">Μηνιαίο Εισόδημα</button>
+    <button class="ttab" onclick="sw('sp',this)">Splits</button>
+    <button class="ttab" onclick="sw('p1',this)">Ανά €100</button>
+    <button class="ttab" onclick="sw('tm',this)">Ανά TM</button>
+  </div>
+
+  <div class="tc on" id="tc-ov">
+    <div class="h3" style="margin-top:20px">Σύνοψη Ετήσιων Εσόδων</div>
+    <div class="text-block">Σύγκριση ετήσιων επαναλαμβανόμενων εσόδων ανά stakeholder (χωρίς εφάπαξ bonus).</div>
+    <div class="gallery" id="gallery"></div>
+    <div id="chk"></div>
+    <div id="bonusNote"></div>
+  </div>
+
+  <div class="tc" id="tc-mo">
+    <div class="h3" style="margin-top:20px">💰 Μηνιαίο Εισόδημα</div>
+    <div class="text-block">Σύγκριση μηνιαίου καθαρού εισοδήματος (επαναλαμβανόμενο). Το recruitment bonus εμφανίζεται ξεχωριστά ως εφάπαξ κόστος.</div>
+    <div id="monthly"></div>
+  </div>
+
+  <div class="tc" id="tc-sp">
+    <div class="h3" style="margin-top:20px">Ανάλυση Commission Splits</div>
+    <div class="text-block">Πλήρης κατανομή επαναλαμβανόμενων εσόδων ανά κατηγορία.</div>
+    <div class="two-col" id="splits"></div>
+    <div id="bonusNoteSplits"></div>
+  </div>
+
+  <div class="tc" id="tc-p1">
+    <div class="h3" style="margin-top:20px">Κατανομή ανά €100</div>
+    <div class="text-block">Πώς κατανέμεται κάθε €100 GCI μεταξύ RE/MAX, agent και broker.</div>
+    <div class="two-col" id="p100"></div>
+  </div>
+
+  <div class="tc" id="tc-tm">
+    <div class="h3" style="margin-top:20px">Ανάλυση ανά Team Member</div>
+    <div class="text-block">Αναλυτική σύγκριση εσόδων κάθε μέλους, με RE/MAX 9% franchise fee.</div>
+    <div style="overflow-x:auto"><table class="ntable" id="tt"></table></div>
+  </div>
+
+  </div><!-- /sec-team -->
+
+  <!-- SECTION: INDIVIDUAL AGENT -->
+  <div class="sec" id="sec-ind">
+  <div id="tc-ind">
+    <div class="h3" style="margin-top:20px">Υπολογιστής Individual Agent</div>
+    <div class="text-block">3 Σκαλιά — Prospective Split. GCI − 9% RE/MAX, μετά split ανά ζώνη.</div>
+
+    <!-- Inputs -->
+    <div class="input-row">
+      <div class="input-field">
+        <label>Όνομα Agent</label>
+        <input type="text" id="iName" value="Agent 1" oninput="calcInd()">
+      </div>
+      <div class="input-field">
+        <label>Ετήσιο GCI (€)</label>
+        <input type="text" id="iGCI" value="70.000" oninput="calcInd()">
+        <div class="input-hint">Σωρευτικό Gross Commission Income</div>
+      </div>
+    </div>
+
+    <div class="divider" style="margin:20px 0"></div>
+    <div class="h3" style="font-size:16px;margin:12px 0 8px">Σκαλιά Split (Agent / Office)</div>
+    <div class="text-block" style="font-size:13px">GCI − 9% RE/MAX → το υπόλοιπο μοιράζεται Agent/Office βάσει σκαλιού.</div>
+
+    <div class="ind-tiers">
+      <div class="ind-tier">
+        <div class="ind-tier-head" style="background:var(--notion-canvas)">
+          <span class="tag tag-blue">Σκαλί 1</span><span class="ind-tier-split">50 / 50</span>
+        </div>
+        <div class="ind-tier-body">
+          <label>Έως (€)</label>
+          <input type="text" id="iT1" value="35.000" oninput="calcInd()">
+          <label>Agent %</label>
+          <input type="text" id="iS1" value="0.50" oninput="calcInd()">
+          <div class="ind-off-pct">Office: <strong id="i-off1">50.00%</strong></div>
+        </div>
+      </div>
+      <div class="ind-tier">
+        <div class="ind-tier-head" style="background:var(--notion-orange-bg)">
+          <span class="tag tag-orange">Σκαλί 2</span><span class="ind-tier-split">60 / 40</span>
+        </div>
+        <div class="ind-tier-body">
+          <label>Έως (€)</label>
+          <input type="text" id="iT2" value="55.000" oninput="calcInd()">
+          <label>Agent %</label>
+          <input type="text" id="iS2" value="0.60" oninput="calcInd()">
+          <div class="ind-off-pct">Office: <strong id="i-off2">40.00%</strong></div>
+        </div>
+      </div>
+      <div class="ind-tier">
+        <div class="ind-tier-head" style="background:var(--notion-green-bg)">
+          <span class="tag tag-green">Σκαλί 3</span><span class="ind-tier-split">70 / 30</span>
+        </div>
+        <div class="ind-tier-body">
+          <label>Πάνω από</label>
+          <div class="ind-t3-label" id="i-t3label">€55.000+</div>
+          <label>Agent %</label>
+          <input type="text" id="iS3" value="0.70" oninput="calcInd()">
+          <div class="ind-off-pct">Office: <strong id="i-off3">30.00%</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-row" style="margin-top:16px">
+      <div class="input-field" style="max-width:180px">
+        <label>RE/MAX %</label>
+        <input type="text" id="iRMX" value="0.09" oninput="calcInd()">
+      </div>
+      <div class="input-field" style="max-width:180px">
+        <label>Desk Fee (€/μήνα)</label>
+        <input type="text" id="iDesk" value="100" oninput="calcInd()">
+      </div>
+    </div>
+
+    <div class="stats-bar" id="i-stats"></div>
+    <div class="divider"></div>
+
+    <!-- Individual Agent Tabs -->
+    <div class="toggle-tabs">
+      <button class="ttab on" onclick="swInd('iov',this)">Σύνοψη</button>
+      <button class="ttab" onclick="swInd('imo',this)">Μηνιαίο Εισόδημα</button>
+      <button class="ttab" onclick="swInd('isp',this)">Splits</button>
+      <button class="ttab" onclick="swInd('ip1',this)">Ανά €100</button>
+    </div>
+
+    <!-- Tab: Σύνοψη -->
+    <div class="tc on" id="tc-iov">
+      <div class="h3" style="margin-top:20px">Αποτελέσματα <span style="font-weight:400;color:var(--notion-text-gray);font-size:14px" id="i-sub"></span></div>
+      <div class="ind-status-bar">
+        <div class="ind-status-item"><div class="ind-s-label">Τρέχον Σκαλί</div><div class="ind-s-val" id="i-tier"></div></div>
+        <div class="ind-status-item"><div class="ind-s-label">Τρέχον Split</div><div class="ind-s-val" id="i-curSplit"></div></div>
+        <div class="ind-status-item"><div class="ind-s-label">Επόμενο σκαλί σε</div><div class="ind-s-val" id="i-nextIn"></div></div>
+      </div>
+      <div class="h3" style="font-size:15px;margin:20px 0 8px">Ανάλυση ανά ζώνη</div>
+      <div id="i-zones"></div>
+      <div class="divider" style="margin:20px 0"></div>
+      <div class="h3" style="font-size:15px;margin:0 0 12px">Σύνολα — Νέο Μοντέλο</div>
+      <div class="gallery" style="grid-template-columns:repeat(4,1fr)" id="i-gallery"></div>
+      <div class="divider" style="margin:20px 0"></div>
+      <div class="h3" style="font-size:16px;margin:0 0 8px">Σύγκριση: Τρέχον vs Νέο</div>
+      <div class="text-block" style="font-size:13px">Τρέχον: GCI − 9% RE/MAX, μετά 50/50, desk fee €100/μήνα.</div>
+      <div class="gallery" id="i-cmp-gallery"></div>
+      <div id="i-cmp-callout"></div>
+    </div>
+
+    <!-- Tab: Μηνιαίο Εισόδημα -->
+    <div class="tc" id="tc-imo">
+      <div class="h3" style="margin-top:20px">💰 Μηνιαίο Εισόδημα</div>
+      <div class="text-block">Σύγκριση μηνιαίου εισοδήματος τρέχοντος (50/50) vs προτεινόμενου (3 σκαλιά).</div>
+      <div id="i-monthly"></div>
+    </div>
+
+    <!-- Tab: Splits -->
+    <div class="tc" id="tc-isp">
+      <div class="h3" style="margin-top:20px">Ανάλυση Commission Splits</div>
+      <div class="text-block">Πλήρης κατανομή εσόδων — τρέχον μοντέλο vs προτεινόμενο.</div>
+      <div class="two-col" id="i-splits"></div>
+    </div>
+
+    <!-- Tab: Ανά €100 -->
+    <div class="tc" id="tc-ip1">
+      <div class="h3" style="margin-top:20px">Κατανομή ανά €100</div>
+      <div class="text-block">Πώς κατανέμεται κάθε €100 GCI. Τρέχον (50/50) vs Νέο (blended).</div>
+      <div class="two-col" id="i-p100"></div>
+      <div class="divider" style="margin:24px 0"></div>
+      <div class="h3" style="font-size:15px;margin:0 0 4px">Quick Compare — Διαφορετικά GCI</div>
+      <div class="text-block" style="font-size:13px">Σύγκριση τρέχοντος vs προτεινόμενου ανά επίπεδο GCI.</div>
+      <div style="overflow-x:auto"><table class="ntable" id="i-cmpTable"></table></div>
+    </div>
+
+  </div>
+  </div><!-- /sec-ind -->
+</div>
+
+<script>
+let members=[{name:'TM 1',gci:30000},{name:'TM 2',gci:30000},{name:'TM 3',gci:30000}];
+const MAX_TM=12;
+const MAX_TLTIER=5;
+let tlTiers=[];
+let tlTiersOn=false;
+const f=n=>Math.round(n).toLocaleString('de-DE');
+const pc=n=>(n*100).toFixed(2)+'%';
+const prs=s=>parseInt(String(s).replace(/\D/g,''))||0;
+const prsF=s=>parseFloat(String(s).replace(',','.'))||0;
+
+function toggleTlTiers(){tlTiersOn=document.getElementById('tlTierToggle').checked;document.getElementById('tlTiersArea').classList.toggle('on',tlTiersOn);go()}
+
+function addTlTier(){if(tlTiers.length>=MAX_TLTIER)return;const lastTh=tlTiers.length>0?tlTiers[tlTiers.length-1].threshold:0;tlTiers.push({threshold:lastTh+50000,split:0.60});renderTlTiers();go()}
+function removeLastTlTier(){if(tlTiers.length<=0)return;tlTiers.pop();renderTlTiers();go()}
+function removeTlTier(idx){tlTiers.splice(idx,1);renderTlTiers();go()}
+
+function renderTlTiers(){
+  const g=document.getElementById('tlTierGrid');g.innerHTML='';
+  tlTiers.forEach((t,i)=>{
+    const d=document.createElement('div');d.className='tl-tier-card';
+    d.innerHTML=`<div class="tier-num">Σκαλί ${i+2}</div><button class="remove-tier" onclick="removeTlTier(${i})" title="Αφαίρεση">×</button><label>Κατώφλι GCI (€)</label><input type="text" value="${f(t.threshold)}" oninput="updTlTier(${i},'th',this.value)"><label style="margin-top:6px">Agent Split (post-RE/MAX)</label><input type="text" value="${(t.split*100).toFixed(2)}" oninput="updTlTier(${i},'sp',this.value)"><div style="font-size:11px;color:var(--notion-text-faint);margin-top:3px">Office: ${((1-t.split)*100).toFixed(2)}%</div>`;
+    g.appendChild(d)});
+  document.getElementById('btnAddTier').disabled=tlTiers.length>=MAX_TLTIER;
+  document.getElementById('btnRemTier').disabled=tlTiers.length<=0;
+}
+function updTlTier(idx,field,val){
+  if(field==='th')tlTiers[idx].threshold=prs(val);
+  else{let v=prsF(val)/100;v=Math.max(0.01,Math.min(0.99,v));tlTiers[idx].split=v;
+    const card=document.querySelectorAll('.tl-tier-card')[idx];if(card){const hint=card.querySelector('div[style*="11px"]');if(hint)hint.textContent='Office: '+((1-v)*100).toFixed(2)+'%'}}
+  go()}
+
+function calcTlDeal(gci){
+  // Returns {agent, office, rmx} for TL personal deals with tiers
+  const rmx=0.09;const rmxAmt=gci*rmx;const net=gci*(1-rmx);
+  if(!tlTiersOn||tlTiers.length===0){return{agent:net*0.50,office:net*0.50,rmx:rmxAmt,blendedSplit:0.50}}
+  // Sort tiers by threshold ascending
+  const sorted=[{threshold:0,split:0.50},...[...tlTiers].sort((a,b)=>a.threshold-b.threshold)];
+  let agentTotal=0,officeTotal=0;
+  for(let i=0;i<sorted.length;i++){
+    const lo=sorted[i].threshold;
+    const hi=i<sorted.length-1?sorted[i+1].threshold:Infinity;
+    const zoneGci=Math.max(0,Math.min(gci,hi)-lo);
+    if(zoneGci<=0)continue;
+    const zoneNet=zoneGci*(1-rmx);
+    agentTotal+=zoneNet*sorted[i].split;
+    officeTotal+=zoneNet*(1-sorted[i].split);
+  }
+  const blended=net>0?agentTotal/net:0.50;
+  return{agent:agentTotal,office:officeTotal,rmx:rmxAmt,blendedSplit:blended}
+}
+
+function addTM(){if(members.length>=MAX_TM)return;members.push({name:`TM ${members.length+1}`,gci:0});renderGrid();go()}
+function removeLastTM(){if(members.length<=0)return;members.pop();renderGrid();go()}
+function removeTM(idx){members.splice(idx,1);members.forEach((m,i)=>m.name=`TM ${i+1}`);renderGrid();go()}
+
+function renderGrid(){
+  const tg=document.getElementById('tg');tg.innerHTML='';
+  if(members.length===0){tg.innerHTML='<div class="tm-empty" style="grid-column:1/-1">Δεν υπάρχουν Team Members — κάντε κλικ στο "+ Προσθήκη TM"</div>'}
+  members.forEach((m,i)=>{const d=document.createElement('div');d.className='tm-cell'+(m.gci>0?' has-val':'');
+    d.innerHTML=`<label>${m.name}<span class="dot"></span></label><input type="text" value="${m.gci>0?f(m.gci):''}" placeholder="0" oninput="updTM(${i},this.value)"><button class="remove-tm" onclick="removeTM(${i})" title="Αφαίρεση">×</button>`;
+    tg.appendChild(d)});
+  document.getElementById('btnAdd').disabled=members.length>=MAX_TM;
+  document.getElementById('btnRem').disabled=members.length<=0;
+  document.getElementById('nTM').textContent=members.length;
+}
+
+function updTM(idx,val){members[idx].gci=prs(val);
+  const cells=document.querySelectorAll('.tm-cell');if(cells[idx])cells[idx].className='tm-cell'+(members[idx].gci>0?' has-val':'');go()}
+
+function sw(id,el){document.querySelectorAll('#sec-team .ttab').forEach(t=>t.classList.remove('on'));document.querySelectorAll('#sec-team .tc').forEach(t=>t.classList.remove('on'));el.classList.add('on');document.getElementById('tc-'+id).classList.add('on')}
+
+function swInd(id,el){document.querySelectorAll('#sec-ind .ttab').forEach(t=>t.classList.remove('on'));document.querySelectorAll('#sec-ind .tc').forEach(t=>t.classList.remove('on'));el.classList.add('on');document.getElementById('tc-'+id).classList.add('on')}
+
+function swSec(id,el){document.querySelectorAll('.section-btn').forEach(b=>b.classList.remove('on'));document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));el.classList.add('on');document.getElementById('sec-'+id).classList.add('on');if(id==='ind')calcInd()}
+
+function go(){
+  const tl=prs(document.getElementById('tl').value);
+  const tmVals=members.map(m=>m.gci);
+  const a=members.length;
+  const ts=tmVals.reduce((s,v)=>s+v,0);
+  const T=tl+ts;
+
+  // Desk fees
+  const dfO=12000, dmO=a*1200;
+  const dfN=(a>=5?0:a>=3?200:400)*12, dmN=a*1200;
+  // Bonus: one-time, NOT included in recurring
+  const bonusTotal=a*500;
+
+  // Current (recurring)
+  const C={tb:tl*.282,tt:tl*.628,tr:tl*.09,mb:ts*.282,mt:ts*.428,mo:ts*.2,mr:ts*.09};
+  C.B=C.tb+C.mb+dfO+dmO; C.T=C.tt+C.mo-dfO; C.M=C.mt-dmO;
+
+  // New (recurring — no bonus)
+  const tlD=calcTlDeal(tl);
+  const N={tb:tlD.office,tt:tlD.agent,tr:tlD.rmx,mb:ts*.29,mt:ts*.42,mo:ts*.2,mr:ts*.09};
+  N.B=N.tb+N.mb+dfN+dmN; N.T=N.tt+N.mo-dfN; N.M=N.mt-dmN;
+  const tlBlend=tlD.blendedSplit;
+
+  const bp=T>0?N.B/T:0;
+
+  // Stats
+  document.getElementById('stats').innerHTML=`
+    <div class="stat-item"><div class="stat-l">GCI Team Members</div><div class="stat-v">${f(ts)} €</div></div>
+    <div class="stat-item"><div class="stat-l">GCI Ομάδας</div><div class="stat-v">${f(T)} €</div></div>
+    <div class="stat-item"><div class="stat-l">Desk Fee Κλίμακα</div><div class="stat-v">${a>=5?'0':a>=3?'200':'400'} €/μήνα</div></div>
+    <div class="stat-item"><div class="stat-l">TL Desk Fee / έτος (νέο)</div><div class="stat-v">${f(dfN)} €</div></div>
+    ${tlTiersOn&&tlTiers.length>0?`<div class="stat-item"><div class="stat-l">TL Blended Split (post-RE/MAX)</div><div class="stat-v" style="color:var(--notion-green)">${pc(tlBlend)}</div></div>`:''}`;
+
+  // Gallery — recurring only
+  const df2=(x,y)=>{const d=y-x;return`<div class="gc-diff ${d>=0?'pos':'neg'}">${d>=0?'+':''}${f(d)} €</div>`};
+  const tip2=(val,lines)=>'<span class="tip" data-tip="'+lines.join('\n').replace(/"/g,'&quot;')+'">'+val+'</span>';
+  const gc2=(cls,icon,t,x,y,tOld,tNew)=>`<div class="gcard"><div class="gc-tag"><span class="tag tag-${cls}">${icon} ${t}</span></div><div class="gc-row"><div class="gc-col"><div class="gc-sub">Τρέχον</div><div class="gc-val old">${tOld?tip2(f(x)+' €',tOld):f(x)+' €'}</div></div><div class="gc-col"><div class="gc-sub">Νέο</div><div class="gc-val new">${tNew?tip2(f(y)+' €',tNew):f(y)+' €'}</div></div></div>${df2(x,y)}</div>`;
+  document.getElementById('gallery').innerHTML=
+    gc2('blue','🏢','Broker (ετήσιο)',C.B,N.B,
+      ['Commission TL: '+f(C.tb),'Commission TM: '+f(C.mb),'+ Desk TL: '+f(dfO),'+ Desk TM: '+f(dmO),'= '+f(C.B)],
+      ['Commission TL: '+f(N.tb),'Commission TM: '+f(N.mb),'+ Desk TL: '+f(dfN),'+ Desk TM: '+f(dmN),'= '+f(N.B)])+
+    gc2('green','👤','Team Leader',C.T,N.T,
+      ['Commission: '+f(C.tt),'+ Override: '+f(C.mo),'− Desk: '+f(dfO),'= '+f(C.T)],
+      ['Commission: '+f(N.tt),'+ Override: '+f(N.mo),'− Desk: '+f(dfN),'= '+f(N.T)])+
+    gc2('red','👥','Team Members',C.M,N.M,
+      ['Commission: '+f(C.mt),'− Desk: '+f(dmO),'= '+f(C.M)],
+      ['Commission: '+f(N.mt),'− Desk: '+f(dmN),'= '+f(N.M)]);
+
+  const ok=bp>=.28;
+  document.getElementById('chk').innerHTML=ok
+    ?`<div class="callout callout-green"><div class="callout-icon">✅</div><div class="callout-body"><strong>Εντός στόχου</strong> — Broker blended % επί GCI: <strong>${pc(bp)}</strong> (στόχος ≥ 28%)</div></div>`
+    :`<div class="callout callout-red"><div class="callout-icon">⚠️</div><div class="callout-body"><strong>Κάτω από στόχο</strong> — Broker blended % επί GCI: <strong>${pc(bp)}</strong> (στόχος ≥ 28%)</div></div>`;
+
+  // Bonus note
+  const bonusHtml = a>0
+    ? `<div class="callout callout-yellow"><div class="callout-icon">💡</div><div class="callout-body"><strong>Recruitment Bonus (εφάπαξ):</strong> €500 × ${a} TM = <strong>${f(bonusTotal)} €</strong> — καταβάλλεται μία φορά στο πρώτο qualifying deal κάθε TM. Δεν συμπεριλαμβάνεται στα ετήσια/μηνιαία ποσά παραπάνω.</div></div>`
+    : '';
+  document.getElementById('bonusNote').innerHTML=bonusHtml;
+  document.getElementById('bonusNoteSplits').innerHTML=bonusHtml;
+
+  // MONTHLY — recurring
+  function mRow(icon,label,oA,nA,isTot){
+    const om=oA/12,nm=nA/12,d=nm-om;
+    return`<div class="m-row${isTot?' m-total':''}"><div class="m-label">${icon?'<span class="m-icon">'+icon+'</span>':''}${label}</div><div class="m-vals"><div class="m-val old">${f(om)} €</div><div class="m-val new">${f(nm)} €</div><div class="m-val diff ${d>=0?'pos':'neg'}">${d>=0?'+':''}${f(d)} €</div></div></div>`;
+  }
+  const mCols=`<div class="m-cols"><span>Stakeholder</span><span class="h-o">Τρέχον / μήνα</span><span class="h-n">Νέο / μήνα</span><span class="h-d d-col">Διαφορά</span></div>`;
+
+  let allHtml=`<div class="m-card"><div class="m-head"><span>📋 Συγκεντρωτικά (επαναλαμβανόμενο)</span></div>${mCols}
+    ${mRow('🏢','Broker',C.B,N.B)}${mRow('👤','Team Leader',C.T,N.T)}${a>0?mRow('👥','Team Members (σύνολο)',C.M,N.M):''}</div>`;
+
+  let brokerHtml=`<div class="m-card"><div class="m-head"><span>🏢 Broker</span><span class="tag tag-blue">Ανάλυση</span></div>${mCols}
+    ${mRow('','Commission TL Deals',C.tb,N.tb)}${mRow('','Commission TM Deals',C.mb,N.mb)}
+    ${mRow('','TL Desk Fee',dfO,dfN)}${mRow('','TM Desk Fees',dmO,dmN)}
+    ${mRow('','Broker Σύνολο',C.B,N.B,true)}</div>`;
+
+  let tlHtml=`<div class="m-card"><div class="m-head"><span>👤 Team Leader</span><span class="tag tag-green">Ανάλυση</span></div>${mCols}
+    ${mRow('','Commission (ίδια deals)',C.tt,N.tt)}${mRow('','Override (TM deals)',C.mo,N.mo)}
+    ${mRow('','μείον Desk Fee',-dfO,-dfN)}${mRow('','TL Καθαρό Σύνολο',C.T,N.T,true)}</div>`;
+
+  let tmRows2='',totO=0,totN=0;
+  members.forEach((m,i)=>{
+    const oNet=m.gci*.428-1200,nNet=m.gci*.42-1200;totO+=oNet;totN+=nNet;
+    tmRows2+=mRow('',`${m.name} <span style="color:var(--notion-text-faint);font-size:12px">(GCI ${f(m.gci)} €/yr)</span>`,oNet,nNet)});
+  let tmHtml='';
+  if(a>0){tmHtml=`<div class="m-card"><div class="m-head"><span>👥 Team Members</span><span class="tag tag-red">Ανά άτομο</span></div>${mCols}${tmRows2}${mRow('','Σύνολο TM',totO,totN,true)}</div>`}
+
+  // Bonus callout in monthly
+  const bonusMonthly = a>0
+    ? `<div class="callout callout-yellow"><div class="callout-icon">💡</div><div class="callout-body"><strong>Recruitment Bonus (εφάπαξ):</strong> €500 × ${a} TM = <strong>${f(bonusTotal)} €</strong> — καταβάλλεται μία φορά στο πρώτο qualifying deal κάθε TM. Δεν επηρεάζει τους μηνιαίους υπολογισμούς.</div></div>`
+    : '';
+
+  document.getElementById('monthly').innerHTML=allHtml+brokerHtml+tlHtml+tmHtml+bonusMonthly;
+
+  // Splits — recurring, bonus shown separately
+  function pn(cls,t,rows){let h=`<div class="panel ${cls}"><div class="p-head">${t}</div><table class="ntable">`;
+    rows.forEach(r=>{if(r.s){h+=`<tr class="sec"><td colspan=3>${r.s}</td></tr>`;return}
+    h+=`<tr${r.b?' class="tot"':''}${r.ot?' class="onetime"':''}><td class="l">${r.l}</td><td class="r">${r.p||''}</td><td class="r">${r.v}</td></tr>`});return h+'</table></div>'}
+
+  document.getElementById('splits').innerHTML=
+    pn('old','Τρέχον Μοντέλο (70/30)',[
+      {s:'TL Deals'},{l:'RE/MAX',p:'9,00%',v:f(C.tr)},{l:'TL (42,80%+20,00%)',p:'62,80%',v:f(C.tt)},{l:'Broker',p:'28,20%',v:f(C.tb)},
+      {s:'TM Deals'},{l:'RE/MAX',p:'9,00%',v:f(C.mr)},{l:'TM',p:'42,80%',v:f(C.mt)},{l:'TL Override',p:'20,00%',v:f(C.mo)},{l:'Broker',p:'28,20%',v:f(C.mb)},
+      {s:'Desk Fees (ετήσια)'},{l:'TL Desk Fee',p:'1.000 €/μήνα',v:f(dfO)},{l:'TM Desk Fees (×'+a+')',p:'100 €/μήνα',v:f(dmO)},
+      {l:'Broker Σύνολο (ετήσιο)',v:f(C.B)+' €',b:1}
+    ])+pn('new','Προτεινόμενο (Growth Team)',
+      (tlTiersOn&&tlTiers.length>0?
+        [{s:'TL Deals (Κλίμακες)'}].concat(
+          [{l:'RE/MAX',p:'9,00%',v:f(N.tr)},{l:'TL (blended)',p:pc(tlBlend),v:f(N.tt)},{l:'Broker (blended)',p:pc(1-tlBlend),v:f(N.tb)}]
+        )
+      :[{s:'TL Deals'},{l:'RE/MAX',p:'9,00%',v:f(N.tr)},{l:'TL',p:'50,00%',v:f(N.tt)},{l:'Broker',p:'50,00%',v:f(N.tb)}]
+      ).concat([
+      {s:'TM Deals'},{l:'RE/MAX',p:'9,00%',v:f(N.mr)},{l:'TM',p:'42,00%',v:f(N.mt)},{l:'TL Override',p:'20,00%',v:f(N.mo)},{l:'Broker',p:'29,00%',v:f(N.mb)},
+      {s:'Desk Fees (ετήσια)'},{l:`TL Desk Fee (${a} TM)`,p:(a>=5?'0':a>=3?'200':'400')+' €/μήνα',v:f(dfN)},{l:'TM Desk Fees (×'+a+')',p:'100 €/μήνα',v:f(dmN)},
+      {l:'Broker Σύνολο (ετήσιο)',v:f(N.B)+' €',b:1}
+    ]));
+
+  // Per 100
+  const r1=(l,o,n)=>{const d=n-o;return`<tr><td>${l}</td><td class="r o">€${o.toFixed(2)}</td><td class="r n">€${n.toFixed(2)}</td><td class="r d">${d===0?'—':(d>0?'+':'')+d.toFixed(2)}</td></tr>`};
+  const tHead=`<table class="p100-table"><thead><tr><th>Αποδέκτης</th><th class="h-o">Τρέχον</th><th class="h-n">Νέο</th><th class="h-d">Δ</th></tr></thead><tbody>`;
+  const tlNewPct=tlBlend*100*(1-0.09);  // as % of GCI (post rmx effect)
+  const brNewPct=(1-tlBlend)*100*(1-0.09);
+  document.getElementById('p100').innerHTML=`
+    <div class="p100-card"><div class="p100-h">Ανά €100 — TL Deals${tlTiersOn&&tlTiers.length>0?' (blended)':''}</div>${tHead}${r1('RE/MAX',9.00,9.00)}${r1('TL',62.80,tlNewPct)}${r1('Broker',28.20,brNewPct)}</tbody></table></div>
+    <div class="p100-card"><div class="p100-h">Ανά €100 — TM Deals</div>${tHead}${r1('RE/MAX',9.00,9.00)}${r1('TM',42.80,42.00)}${r1('TL Override',20.00,20.00)}${r1('Broker',28.20,29.00)}</tbody></table></div>`;
+
+  // TM Detail with RE/MAX 9%
+  let tb=`<thead><tr><th></th><th class="r">GCI</th><th class="r" style="color:var(--notion-text-light)">RE/MAX</th><th class="r c-red">TM</th><th class="r c-red">Override</th><th class="r c-red">Broker</th><th class="r" style="color:var(--notion-text-light)">RE/MAX</th><th class="r c-grn">TM</th><th class="r c-grn">Override</th><th class="r c-grn">Broker</th></tr></thead><tbody>`;
+  let s2={g:0,rx:0,a2:0,b2:0,c2:0,d2:0,e2:0,f2:0};
+  members.forEach((m,i)=>{
+    const x=m.gci,rx=x*.09,a3=x*.428,b3=x*.2,c3=x*.282,d3=x*.42,e3=x*.2,f3=x*.29;
+    s2.g+=x;s2.rx+=rx;s2.a2+=a3;s2.b2+=b3;s2.c2+=c3;s2.d2+=d3;s2.e2+=e3;s2.f2+=f3;
+    tb+=`<tr><td class="l">${m.name}</td><td class="r">${f(x)}</td><td class="r" style="color:var(--notion-text-light)">${f(rx)}</td><td class="r">${f(a3)}</td><td class="r">${f(b3)}</td><td class="r">${f(c3)}</td><td class="r" style="color:var(--notion-text-light)">${f(rx)}</td><td class="r">${f(d3)}</td><td class="r">${f(e3)}</td><td class="r">${f(f3)}</td></tr>`});
+  if(a===0)tb+=`<tr><td colspan="10" class="l" style="text-align:center;padding:16px;color:var(--notion-text-faint)">Δεν υπάρχουν Team Members</td></tr>`;
+  if(a>0)tb+=`<tr class="tot"><td>Σύνολο</td><td class="r">${f(s2.g)}</td><td class="r">${f(s2.rx)}</td><td class="r">${f(s2.a2)}</td><td class="r">${f(s2.b2)}</td><td class="r">${f(s2.c2)}</td><td class="r">${f(s2.rx)}</td><td class="r">${f(s2.d2)}</td><td class="r">${f(s2.e2)}</td><td class="r">${f(s2.f2)}</td></tr>`;
+  tb+='</tbody>';document.getElementById('tt').innerHTML=tb;
+}
+// ── INDIVIDUAL AGENT CALCULATOR ──
+// Tooltip: tap on mobile
+document.addEventListener('click',function(e){
+  const t=e.target.closest('.tip');
+  document.querySelectorAll('.tip.show').forEach(el=>{if(el!==t)el.classList.remove('show')});
+  if(t)t.classList.toggle('show');
+});
+
+function calcInd(){
+  const gci=prs(document.getElementById('iGCI').value);
+  const t1=prs(document.getElementById('iT1').value);
+  const t2=prs(document.getElementById('iT2').value);
+  const s1=parseFloat(document.getElementById('iS1').value)||0;
+  const s2=parseFloat(document.getElementById('iS2').value)||0;
+  const s3=parseFloat(document.getElementById('iS3').value)||0;
+  const rmx=parseFloat(document.getElementById('iRMX').value)||0;
+  const deskMonth=parseFloat(document.getElementById('iDesk').value)||0;
+  const desk=deskMonth*12;
+  const name=document.getElementById('iName').value;
+
+  const o1=1-s1,o2=1-s2,o3=1-s3;
+  document.getElementById('i-off1').textContent=pc(o1);
+  document.getElementById('i-off2').textContent=pc(o2);
+  document.getElementById('i-off3').textContent=pc(o3);
+  document.getElementById('i-t3label').textContent='€'+f(t2)+'+';
+
+  // Tooltip helper
+  const tip=(val,lines)=>'<span class="tip" data-tip="'+lines.join('\n').replace(/"/g,'&quot;')+'">'+val+'</span>';
+
+  function calcOne(g){
+    const z1=Math.min(g,t1),z2=Math.max(0,Math.min(g,t2)-t1),z3=Math.max(0,g-t2);
+    const net1=z1*(1-rmx),net2=z2*(1-rmx),net3=z3*(1-rmx);
+    const agZ1=net1*s1,agZ2=net2*s2,agZ3=net3*s3;
+    const ofZ1=net1*(1-s1),ofZ2=net2*(1-s2),ofZ3=net3*(1-s3);
+    const rxZ1=z1*rmx,rxZ2=z2*rmx,rxZ3=z3*rmx;
+    const agentGross=agZ1+agZ2+agZ3,officeGross=ofZ1+ofZ2+ofZ3,rmxGross=rxZ1+rxZ2+rxZ3;
+    const agentNet=agentGross-desk,effSplit=g>0?agentNet/g:0,monthly=agentNet/12;
+    const officeTotal=officeGross+desk;
+    let tier=1,curSplit=s1,nextIn=t1-g;
+    if(g>=t2){tier=3;curSplit=s3;nextIn=0}else if(g>=t1){tier=2;curSplit=s2;nextIn=t2-g}
+    return{g,z1,z2,z3,s1,s2,s3,o1,o2,o3,rmx,agZ1,agZ2,agZ3,ofZ1,ofZ2,ofZ3,rxZ1,rxZ2,rxZ3,agentGross,officeGross,rmxGross,agentNet,effSplit,monthly,officeTotal,desk,tier,curSplit,nextIn};
+  }
+
+  function calcCurrent(g){
+    const rxC=g*0.09;const afterRmx=g-rxC;const agC=afterRmx*0.50;const ofC=afterRmx*0.50;
+    const deskC=1200;const agNetC=agC-deskC;const offTotC=ofC+deskC;
+    const effC=g>0?agNetC/g:0;const moC=agNetC/12;
+    return{g,rxC,agC,ofC,deskC,agNetC,offTotC,effC,moC};
+  }
+
+  const r=calcOne(gci);
+  const cur=calcCurrent(gci);
+
+  // Stats bar
+  const blended=gci>0?r.agentGross/(gci*(1-rmx)):s1;
+  document.getElementById('i-stats').innerHTML=`
+    <div class="stat-item"><div class="stat-l">GCI</div><div class="stat-v">${f(gci)} €</div></div>
+    <div class="stat-item"><div class="stat-l">Desk Fee / Έτος</div><div class="stat-v">${f(desk)} €</div></div>
+    <div class="stat-item"><div class="stat-l">Blended Split (post-RE/MAX)</div><div class="stat-v" style="color:var(--notion-green)">${pc(blended)}</div></div>
+    <div class="stat-item"><div class="stat-l">Effective Split (post-desk)</div><div class="stat-v">${pc(r.effSplit)}</div></div>`;
+
+  // ═══ TAB: ΣΎΝΟΨΗ ═══
+  document.getElementById('i-sub').textContent='— '+name;
+  const tL={1:'① 50/50',2:'② 60/40',3:'③ 70/30'};
+  const tC={1:'var(--notion-text-gray)',2:'var(--notion-orange)',3:'var(--notion-green)'};
+  document.getElementById('i-tier').innerHTML=`<span style="color:${tC[r.tier]}">${tL[r.tier]}</span>`;
+  document.getElementById('i-curSplit').innerHTML=`<span style="color:${tC[r.tier]}">${(r.curSplit*100).toFixed(2)}/${((1-r.curSplit)*100).toFixed(2)}</span>`;
+  document.getElementById('i-nextIn').innerHTML=r.nextIn>0?f(r.nextIn)+' € ακόμα':'<span style="color:var(--notion-green)">MAX</span>';
+
+  // Zone breakdown with tooltips
+  const zones=[
+    {label:'Σκαλί 1: €0 – €'+f(t1),split:(s1*100).toFixed(0)+'/'+(o1*100).toFixed(0),gci:r.z1,ag:r.agZ1,of:r.ofZ1,sp:s1,color:'var(--notion-blue)',bg:'var(--notion-blue-bg)',active:r.z1>0},
+    {label:'Σκαλί 2: €'+f(t1)+' – €'+f(t2),split:(s2*100).toFixed(0)+'/'+(o2*100).toFixed(0),gci:r.z2,ag:r.agZ2,of:r.ofZ2,sp:s2,color:'var(--notion-orange)',bg:'var(--notion-orange-bg)',active:r.z2>0},
+    {label:'Σκαλί 3: €'+f(t2)+'+',split:(s3*100).toFixed(0)+'/'+(o3*100).toFixed(0),gci:r.z3,ag:r.agZ3,of:r.ofZ3,sp:s3,color:'var(--notion-green)',bg:'var(--notion-green-bg)',active:r.z3>0},
+  ];
+  document.getElementById('i-zones').innerHTML=zones.map(z=>{
+    const net=z.gci*(1-rmx);
+    const agTip=[`${f(z.gci)} × ${pc(1-rmx)} = ${f(net)}`,`${f(net)} × ${pc(z.sp)} = ${f(z.ag)}`];
+    const ofTip=[`${f(net)} × ${pc(1-z.sp)} = ${f(z.of)}`];
+    return `<div class="ind-zone ${z.active?'':'inactive'}">
+      <div class="ind-zone-head" style="background:${z.bg}"><span style="color:${z.color}">${z.label}</span><span class="tag" style="background:${z.bg};color:${z.color}">${z.split}</span></div>
+      <div class="ind-zone-grid">
+        <div class="ind-zone-cell"><div class="zl">GCI ζώνης</div><div class="zv">${f(z.gci)} €</div></div>
+        <div class="ind-zone-cell" style="background:var(--notion-orange-bg)"><div class="zl">Agent</div><div class="zv" style="color:var(--notion-orange)">${tip(f(z.ag)+' €',agTip)}</div></div>
+        <div class="ind-zone-cell" style="background:var(--notion-blue-bg)"><div class="zl">Office</div><div class="zv" style="color:var(--notion-blue)">${tip(f(z.of)+' €',ofTip)}</div></div>
+      </div>
+    </div>`}).join('');
+
+  // Summary gallery with tooltips
+  const agTipLines=[`Σκαλί1: ${f(r.agZ1)}`,`Σκαλί2: ${f(r.agZ2)}`,`Σκαλί3: ${f(r.agZ3)}`,`Σύνολο: ${f(r.agentGross)}`];
+  const netTipLines=[...agTipLines,`− Desk: ${f(desk)}`,`= ${f(r.agentNet)}`];
+  document.getElementById('i-gallery').innerHTML=`
+    <div class="gcard"><div class="gc-tag"><span class="tag tag-orange">Agent Gross</span></div><div class="gc-row"><div class="gc-col"><div class="gc-val new">${tip(f(r.agentGross)+' €',agTipLines)}</div></div></div></div>
+    <div class="gcard"><div class="gc-tag"><span class="tag tag-blue">Office Gross</span></div><div class="gc-row"><div class="gc-col"><div class="gc-val" style="color:var(--notion-blue)">${tip(f(r.officeGross)+' €',[`Σκαλί1: ${f(r.ofZ1)}`,`Σκαλί2: ${f(r.ofZ2)}`,`Σκαλί3: ${f(r.ofZ3)}`])}</div></div></div></div>
+    <div class="gcard"><div class="gc-tag"><span class="tag" style="background:var(--notion-canvas);color:var(--notion-text-gray)">RE/MAX</span></div><div class="gc-row"><div class="gc-col"><div class="gc-val" style="color:var(--notion-text-gray)">${tip(f(r.rmxGross)+' €',[`${f(gci)} × ${pc(rmx)} = ${f(r.rmxGross)}`])}</div></div></div></div>
+    <div class="gcard" style="border-color:rgba(15,123,108,0.3)"><div class="gc-tag"><span class="tag tag-green">Agent Net</span></div><div class="gc-row"><div class="gc-col"><div class="gc-val new" style="font-size:22px">${tip(f(r.agentNet)+' €',netTipLines)}</div></div></div></div>`;
+
+  // Comparison gallery
+  const df=(x,y)=>{const d=y-x;return`<div class="gc-diff ${d>=0?'pos':'neg'}">${d>=0?'+':''}${f(d)} €</div>`};
+  const cmpCard=(cls,icon,title,oldVal,newVal,tipLines)=>`<div class="gcard"><div class="gc-tag"><span class="tag tag-${cls}">${icon} ${title}</span></div><div class="gc-row"><div class="gc-col"><div class="gc-sub">Τρέχον</div><div class="gc-val old">${f(oldVal)} €</div></div><div class="gc-col"><div class="gc-sub">Νέο</div><div class="gc-val new">${tipLines?tip(f(newVal)+' €',tipLines):f(newVal)+' €'}</div></div></div>${df(oldVal,newVal)}</div>`;
+
+  document.getElementById('i-cmp-gallery').innerHTML=
+    cmpCard('orange','👤','Agent Net/Έτος',cur.agNetC,r.agentNet,netTipLines)+
+    cmpCard('orange','','Agent /Μήνα',cur.moC,r.monthly,[`${f(r.agentNet)} / 12 = ${f(r.monthly)}`])+
+    cmpCard('blue','🏢','Έσοδα Γραφείου',cur.offTotC,r.officeTotal,[`Office Gross: ${f(r.officeGross)}`,`+ Desk Fee: ${f(desk)}`,`= ${f(r.officeTotal)}`]);
+
+  // Callout
+  const agDiff=r.agentNet-cur.agNetC;const offDiff=r.officeTotal-cur.offTotC;
+  document.getElementById('i-cmp-callout').innerHTML=gci>0?`
+    <div class="callout ${agDiff>=0?'callout-green':'callout-red'}" style="margin-top:12px">
+      <div class="callout-icon">${agDiff>=0?'✅':'⚠️'}</div>
+      <div class="callout-body">
+        <strong>Agent:</strong> ${agDiff>=0?'+':''}${f(agDiff)} €/έτος (${agDiff>=0?'+':''}${f(agDiff/12)} €/μήνα) vs τρέχον.
+        <strong>Γραφείο:</strong> ${offDiff>=0?'+':''}${f(offDiff)} €/έτος vs τρέχον.
+      </div>
+    </div>`:'';
+
+  // ═══ TAB: ΜΗΝΙΑΙΟ ΕΙΣΟΔΗΜΑ ═══
+  function mR(label,oA,nA,isTot){
+    const om=oA/12,nm=nA/12,d=nm-om;
+    const tipO=[`${f(oA)} / 12 = ${f(om)}`];
+    const tipN=[`${f(nA)} / 12 = ${f(nm)}`];
+    return`<div class="m-row${isTot?' m-total':''}"><div class="m-label">${label}</div><div class="m-vals"><div class="m-val old">${tip(f(om)+' €',tipO)}</div><div class="m-val new">${tip(f(nm)+' €',tipN)}</div><div class="m-val diff ${d>=0?'pos':'neg'}">${d>=0?'+':''}${f(d)} €</div></div></div>`}
+  const mCols=`<div class="m-cols"><span>Κατηγορία</span><span class="h-o">Τρέχον / μήνα</span><span class="h-n">Νέο / μήνα</span><span class="h-d d-col">Διαφορά</span></div>`;
+
+  document.getElementById('i-monthly').innerHTML=`
+    <div class="m-card"><div class="m-head"><span>👤 ${name}</span><span class="tag tag-green">Ανάλυση</span></div>${mCols}
+      ${mR('Agent Gross Commission',cur.agC,r.agentGross)}
+      ${mR('μείον Desk Fee',-cur.deskC,-desk)}
+      ${mR('Agent Καθαρά',cur.agNetC,r.agentNet,true)}</div>
+    <div class="m-card"><div class="m-head"><span>🏢 Γραφείο</span><span class="tag tag-blue">Ανάλυση</span></div>${mCols}
+      ${mR('Office Commission',cur.ofC,r.officeGross)}
+      ${mR('Desk Fee εισπράξεις',cur.deskC,desk)}
+      ${mR('Γραφείο Σύνολο',cur.offTotC,r.officeTotal,true)}</div>
+    <div class="m-card"><div class="m-head"><span>🔵 RE/MAX</span></div>${mCols}
+      ${mR('Franchise Fee (9%)',cur.rxC,r.rmxGross)}</div>`;
+
+  // ═══ TAB: SPLITS ═══
+  function pn2(cls,t,rows){let h=`<div class="panel ${cls}"><div class="p-head">${t}</div><table class="ntable">`;
+    rows.forEach(r=>{if(r.s){h+=`<tr class="sec"><td colspan=3>${r.s}</td></tr>`;return}
+    h+=`<tr${r.b?' class="tot"':''}><td class="l">${r.l}</td><td class="r">${r.p||''}</td><td class="r">${r.v}</td></tr>`});return h+'</table></div>'}
+
+  // Build tier rows for new panel
+  let tierRows=[{s:'Splits ανά Ζώνη'}];
+  tierRows.push({l:'RE/MAX',p:pc(rmx),v:f(r.rmxGross)});
+  if(r.z1>0)tierRows.push({l:`Ζώνη 1 (€0–${f(t1)}): Agent`,p:pc(s1),v:f(r.agZ1)});
+  if(r.z1>0)tierRows.push({l:`Ζώνη 1: Office`,p:pc(o1),v:f(r.ofZ1)});
+  if(r.z2>0)tierRows.push({l:`Ζώνη 2 (${f(t1)}–${f(t2)}): Agent`,p:pc(s2),v:f(r.agZ2)});
+  if(r.z2>0)tierRows.push({l:`Ζώνη 2: Office`,p:pc(o2),v:f(r.ofZ2)});
+  if(r.z3>0)tierRows.push({l:`Ζώνη 3 (${f(t2)}+): Agent`,p:pc(s3),v:f(r.agZ3)});
+  if(r.z3>0)tierRows.push({l:`Ζώνη 3: Office`,p:pc(o3),v:f(r.ofZ3)});
+  tierRows.push({s:'Σύνολα'});
+  tierRows.push({l:'Agent Gross',p:pc(blended),v:f(r.agentGross)});
+  tierRows.push({l:'Office Gross',p:pc(1-blended),v:f(r.officeGross)});
+  tierRows.push({s:'Desk Fee'},{l:'Desk Fee',p:f(deskMonth)+' €/μήνα',v:f(desk)});
+  tierRows.push({l:'Agent Net (ετήσιο)',v:f(r.agentNet)+' €',b:1});
+
+  document.getElementById('i-splits').innerHTML=
+    pn2('old','Τρέχον Μοντέλο (50/50)',[
+      {s:'Split'},{l:'RE/MAX',p:'9,00%',v:f(cur.rxC)},{l:'Agent',p:'50,00%',v:f(cur.agC)},{l:'Office',p:'50,00%',v:f(cur.ofC)},
+      {s:'Desk Fee'},{l:'Desk Fee',p:'100 €/μήνα',v:f(cur.deskC)},
+      {l:'Agent Net (ετήσιο)',v:f(cur.agNetC)+' €',b:1}
+    ])+pn2('new','Προτεινόμενο (3 Σκαλιά)',tierRows);
+
+  // ═══ TAB: ΑΝΆ €100 ═══
+  const r1=(l,o,n)=>{const d=n-o;return`<tr><td>${l}</td><td class="r o">€${o.toFixed(2)}</td><td class="r n">€${n.toFixed(2)}</td><td class="r d">${d===0?'—':(d>0?'+':'')+d.toFixed(2)}</td></tr>`};
+  const tHead=`<table class="p100-table"><thead><tr><th>Αποδέκτης</th><th class="h-o">Τρέχον</th><th class="h-n">Νέο</th><th class="h-d">Δ</th></tr></thead><tbody>`;
+  const curAgPct=50*(1-0.09);  // 45.50
+  const curOfPct=50*(1-0.09);  // 45.50
+  const newAgPct=blended*100*(1-rmx);
+  const newOfPct=(1-blended)*100*(1-rmx);
+  document.getElementById('i-p100').innerHTML=`
+    <div class="p100-card"><div class="p100-h">Ανά €100 GCI</div>${tHead}${r1('RE/MAX',9.00,9.00)}${r1('Agent',curAgPct,newAgPct)}${r1('Office',curOfPct,newOfPct)}</tbody></table></div>`;
+
+  // Quick Compare table
+  const steps=[15000,25000,35000,40000,45000,55000,60000,70000,80000,100000,120000];
+  let cmpHtml='<thead><tr><th class="r">GCI</th><th>Σκαλί</th><th class="r" style="color:var(--notion-red)">Agent Net<br><small>Τρέχον</small></th><th class="r c-grn">Agent Net<br><small>Νέο</small></th><th class="r">Δ Agent</th><th class="r" style="color:var(--notion-red)">Office<br><small>Τρέχον</small></th><th class="r" style="color:var(--notion-blue)">Office<br><small>Νέο</small></th><th class="r">Δ Office</th><th class="r">Eff.<br><small>Τρέχον</small></th><th class="r">Eff.<br><small>Νέο</small></th></tr></thead><tbody>';
+  steps.forEach(g=>{
+    const c=calcOne(g);const cc=calcCurrent(g);const isCur=g===gci;
+    const trCls=isCur?' style="background:var(--notion-green-bg);font-weight:600"':'';
+    const dAg=c.agentNet-cc.agNetC;const dOf=c.officeTotal-cc.offTotC;
+    cmpHtml+=`<tr${trCls}><td class="r">${f(g)} €${isCur?' ★':''}</td><td><span style="color:${tC[c.tier]};font-weight:600">${tL[c.tier]}</span></td><td class="r" style="color:var(--notion-red)">${f(cc.agNetC)}</td><td class="r" style="color:var(--notion-green);font-weight:700">${f(c.agentNet)}</td><td class="r" style="color:${dAg>=0?'var(--notion-green)':'var(--notion-red)'};font-weight:600">${dAg>=0?'+':''}${f(dAg)}</td><td class="r" style="color:var(--notion-red)">${f(cc.offTotC)}</td><td class="r" style="color:var(--notion-blue)">${f(c.officeTotal)}</td><td class="r" style="color:${dOf>=0?'var(--notion-green)':'var(--notion-red)'};font-weight:600">${dOf>=0?'+':''}${f(dOf)}</td><td class="r">${pc(cc.effC)}</td><td class="r">${pc(c.effSplit)}</td></tr>`;
+  });
+  cmpHtml+='</tbody>';
+  document.getElementById('i-cmpTable').innerHTML=cmpHtml;
+}
+
+renderGrid();go();
+
+// Password check — SHA-256 hash of "deltaktima"
+const PW_HASH='045efe6575421bf7e3252b27c12451656d40cc741e8f7b9271bb6d1f1ffde2bf';
+async function checkPw(){
+  const input=document.getElementById('pw-input').value;
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(input));
+  const hash=Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  if(hash===PW_HASH){
+    document.getElementById('pw-overlay').classList.add('hidden');
+    document.getElementById('app-content').classList.add('visible');
+    sessionStorage.setItem('pw-ok-gc','1');
+  }else{
+    document.getElementById('pw-error').style.display='block';
+    document.getElementById('pw-input').value='';
+    document.getElementById('pw-input').focus();
+  }
+}
+if(sessionStorage.getItem('pw-ok-gc')==='1'){
+  document.getElementById('pw-overlay').classList.add('hidden');
+  document.getElementById('app-content').classList.add('visible');
+}
+</script>
+</div><!-- /app-content -->
+</body>
+</html>
